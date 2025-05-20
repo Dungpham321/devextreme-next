@@ -161,7 +161,11 @@ export default function Home() {
   }];
   const ChildProps = {
     dataSource: employees,
-    keyExpr: "EmployeeID"
+    keyExpr: "EmployeeID",
+    n:true,
+    e:true,
+    d: true,
+    c:false
   }
   //các cột của lưới
   const col = [
@@ -178,6 +182,9 @@ export default function Home() {
           keyExpr={ChildProps.keyExpr}
           // @ts-ignore
           cols={col}
+          n={ChildProps.n}
+          e={ChildProps.e}
+          d={ChildProps.d}
         />
     </div>
   );

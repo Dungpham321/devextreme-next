@@ -24,3 +24,13 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+.dx-datagrid-headers .dx-datagrid-table .dx-row > td {
+    text-align: center !important;
+}
+.dx-header-row > td {
+    font-weight: bold;
+}
+.dx-datagrid-table .dx-header-row, .dx-treelist-table .dx-header-row {
+    background: #d9edf7;
+    color: #000;
+}
