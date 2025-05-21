@@ -9,7 +9,6 @@ module.exports = class DangNhapController extends baseController{
         const op = req.params.op;
         if(op == "login"){
             const data = Object(req.body);
-            console.log(data);
             const objHT_NGUOIDUNG =await this.db.UserCollection.GetByTendangNhap(data.ten_dang_nhap);
             if(objHT_NGUOIDUNG != null){
                 const match = await bcrypt.compare(data.mat_khau, objHT_NGUOIDUNG.mat_khau);

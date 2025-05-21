@@ -2,7 +2,6 @@
 const DBContext = require('../models/DBContext');
 const {RequestState} = require('../Library/Enum');
 const jwt = require('jsonwebtoken');
-
 require('dotenv').config();
 module.exports = class baseController{
     constructor(){
@@ -36,15 +35,20 @@ module.exports = class baseController{
     getFields = (schema) => { 
         const fields ={}; 
         schema.eachPath((path) => { 
-            fields[path] = null;
+            if(path !== '_id'){
+                fields[path] = null;
+            }
+            
         }); 
         return fields; 
     };
     Mapfields = (schema, values) =>{
         const fields = this.getFields(schema);
+        
         for(const key in fields){
             if(values.hasOwnProperty(key)){
                 fields[key] = values[key];
+                
             }
         }
        return fields;

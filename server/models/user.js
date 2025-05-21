@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const userSchema = new mongoose.Schema({
+ _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
  ten_dang_nhap:{type: String},
  mat_khau:{type:String},
  ho_ten:{type: String},
