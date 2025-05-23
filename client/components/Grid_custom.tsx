@@ -1,11 +1,10 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useRef, useState, forwardRef, RefObject } from 'react'
 import DataGrid, {
   Column, Paging, Pager, SearchPanel, Editing, Popup, Form, Selection, type DataGridTypes, Item,
   Toolbar, Export, DataGridRef, LoadPanel
 } from 'devextreme-react/data-grid';
 import 'devextreme-react/text-area';
 import 'devextreme/dist/css/dx.light.css';
-import themes from 'devextreme/ui/themes';
 import type { LocateInMenuMode, ShowTextMode } from "devextreme/ui/toolbar";
 import type { ToolbarItemLocation, ToolbarItemComponent } from "devextreme/common";
 import { jsPDF } from 'jspdf';
@@ -138,8 +137,7 @@ const Addcolumn = ({ items }: { items: any[] }) => {
   );
 
 };
-
-const Grid_custom = (props: ChildProps) => {
+const Grid_custom = forwardRef<DataGridRef, ChildProps>((props:ChildProps , gridRef) => {
   const allowedPageSizes = [10, 100, 200];
   const notesEditorOptions = { height: 100 };
   const [toolbars, settoolbars] = useState(props.toolbars || []);
@@ -150,12 +148,11 @@ const Grid_custom = (props: ChildProps) => {
   const [visibleDelete, setvisibleDelete] = useState(props.d);
   const [visibleCopy, setvisibleCopy] = useState(props.c || false);
   //end
-
   const selectedChanged = useCallback((e: DataGridTypes.SelectionChangedEvent) => {
     setSelectedRowIndex(e.component.getRowIndexByKey(e.selectedRowKeys[0]));
   }, [setSelectedRowIndex]);
 
-  const gridRef = useRef<DataGridRef>(null);
+
   const toolbarItem = [
     {
       location: "after" as ToolbarItemLocation,
@@ -237,19 +234,20 @@ const Grid_custom = (props: ChildProps) => {
     },
   ];
   const addRow = useCallback(() => {
-    gridRef.current?.instance().addRow();
-    gridRef.current?.instance().deselectAll();
+    (gridRef as RefObject<DataGridRef>).current?.instance().addRow();
+    (gridRef as RefObject<DataGridRef>).current?.instance().deselectAll();
   }, [gridRef]);
 
   //edit
   const editRow = useCallback(() => {
-    gridRef.current?.instance().editRow(selectedRowIndex);
-    gridRef.current?.instance().deselectAll();
+    (gridRef as RefObject<DataGridRef>).current?.instance().editRow(selectedRowIndex);
+    (gridRef as RefObject<DataGridRef>).current?.instance().deselectAll();
   }, [gridRef, selectedRowIndex]);
   //delete
   const deleteRow = useCallback(() => {
-    gridRef.current?.instance().deleteRow(selectedRowIndex);
-    gridRef.current?.instance().deselectAll();
+   (gridRef as RefObject<DataGridRef>).current?.instance().deleteRow(selectedRowIndex);
+   (gridRef as RefObject<DataGridRef>).current?.instance().deselectAll();
+
   }, [gridRef, selectedRowIndex]);
   //export
   const exportFormats = ['pdf'];
@@ -273,7 +271,7 @@ const Grid_custom = (props: ChildProps) => {
   }
   //end 
   const refreshDataGrid = () => {
-    gridRef.current?.instance().refresh();
+    (gridRef as RefObject<DataGridRef>).current?.instance().refresh();
   }
   return (
     <DataGrid
@@ -311,6 +309,5 @@ const Grid_custom = (props: ChildProps) => {
       <LoadPanel enabled={true} />
     </DataGrid>
   )
-}
+});
 export default Grid_custom;
-
