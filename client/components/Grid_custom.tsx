@@ -10,6 +10,7 @@ import type { ToolbarItemLocation, ToolbarItemComponent } from "devextreme/commo
 import { jsPDF } from 'jspdf';
 import { exportDataGrid } from 'devextreme/pdf_exporter';
 type ChildProps = {
+  Title:string;
   dataSource: {};
   keyExpr: string;
   cols: [];
@@ -137,7 +138,7 @@ const Addcolumn = ({ items }: { items: any[] }) => {
   );
 
 };
-const Grid_custom = forwardRef<DataGridRef, ChildProps>((props:ChildProps , gridRef) => {
+const Grid_custom = forwardRef<DataGridRef, ChildProps>((props: ChildProps, gridRef) => {
   const allowedPageSizes = [10, 100, 200];
   const notesEditorOptions = { height: 100 };
   const [toolbars, settoolbars] = useState(props.toolbars || []);
@@ -163,7 +164,7 @@ const Grid_custom = forwardRef<DataGridRef, ChildProps>((props:ChildProps , grid
         icon: "refresh",
         hint: 'Làm mới dữ liệu',
         onClick: function () {
-            refreshDataGrid();
+          refreshDataGrid();
         },
       }
     },
@@ -245,8 +246,8 @@ const Grid_custom = forwardRef<DataGridRef, ChildProps>((props:ChildProps , grid
   }, [gridRef, selectedRowIndex]);
   //delete
   const deleteRow = useCallback(() => {
-   (gridRef as RefObject<DataGridRef>).current?.instance().deleteRow(selectedRowIndex);
-   (gridRef as RefObject<DataGridRef>).current?.instance().deselectAll();
+    (gridRef as RefObject<DataGridRef>).current?.instance().deleteRow(selectedRowIndex);
+    (gridRef as RefObject<DataGridRef>).current?.instance().deselectAll();
 
   }, [gridRef, selectedRowIndex]);
   //export
@@ -274,40 +275,48 @@ const Grid_custom = forwardRef<DataGridRef, ChildProps>((props:ChildProps , grid
     (gridRef as RefObject<DataGridRef>).current?.instance().refresh();
   }
   return (
-    <DataGrid
-      dataSource={props.dataSource}
-      keyExpr={props.keyExpr}
-      showBorders={true}
-      columnAutoWidth={true}
-      allowColumnReordering={true}
-      showColumnLines={true}
-      showRowLines={true}
-      rowAlternationEnabled={true}
-      width={'100%'}
-      height={'100%'}
-      ref={gridRef}
-      onExporting={onExporting}
-      onToolbarPreparing={onToolbarPreparing}
-      onSelectionChanged={selectedChanged}
-      allowColumnResizing ={true}
-    >
-      {/* columns */}
-      <Addcolumn items={props.cols} />
-      {/* end */}
-
-      <Paging defaultPageSize={10} />
-      <Pager visible={true} showPageSizeSelector={true} allowedPageSizes={allowedPageSizes} />
-      <Selection mode="multiple" selectAllMode={"allPages"} showCheckBoxesMode={"onClick"} />
-      <SearchPanel visible={true} placeholder="Tra cứu" width={280} />
-      <Editing mode="popup">
-        <Popup title="Thêm mới" showTitle={true} width={700} height={525} />
-        <Form>
+    <div className='m-[10px] '>
+      <div className='Title_content font-bold text-lg'>
+        {props.Title}
+      </div>
+      <div className='dataGrid'>
+        <DataGrid
+          dataSource={props.dataSource}
+          keyExpr={props.keyExpr}
+          showBorders={true}
+          columnAutoWidth={true}
+          allowColumnReordering={true}
+          showColumnLines={true}
+          showRowLines={true}
+          rowAlternationEnabled={true}
+          width={'100%'}
+          height={'100%'}
+          ref={gridRef}
+          onExporting={onExporting}
+          onToolbarPreparing={onToolbarPreparing}
+          onSelectionChanged={selectedChanged}
+          allowColumnResizing={true}
+        >
+          {/* columns */}
           <Addcolumn items={props.cols} />
-        </Form>
-      </Editing>
-      <Export enabled={true} formats={exportFormats} allowExportSelectedData={true} />
-      <LoadPanel enabled={true} />
-    </DataGrid>
+          {/* end */}
+
+          <Paging defaultPageSize={10} />
+          <Pager visible={true} showPageSizeSelector={true} allowedPageSizes={allowedPageSizes} />
+          <Selection mode="multiple" selectAllMode={"allPages"} showCheckBoxesMode={"onClick"} />
+          <SearchPanel visible={true} placeholder="Tra cứu" width={280} />
+          <Editing mode="popup">
+            <Popup title="Thêm mới" showTitle={true} width={700} height={525} />
+            <Form>
+              <Addcolumn items={props.cols} />
+            </Form>
+          </Editing>
+          <Export enabled={true} formats={exportFormats} allowExportSelectedData={true} />
+          <LoadPanel enabled={true} />
+        </DataGrid>
+      </div>
+    </div>
+
   )
 });
 export default Grid_custom;
