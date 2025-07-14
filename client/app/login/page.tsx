@@ -24,6 +24,10 @@ import 'devextreme-react/text-area';
 import 'devextreme-react/autocomplete';
 import 'devextreme-react/date-range-box';
 import 'devextreme/dist/css/dx.light.css';
+import {Login, getUser} from '@/connect/ApiContext';
+import { SetCookie } from '@/components/auth/cookies';
+import { useRouter } from 'next/navigation';
+
 const passwordOptions = {
     mode: 'password',
     placeholder: 'Nhập mật khẩu', // Optional: add a placeholder
@@ -37,6 +41,7 @@ const formData = {
 }
 
 const login = () => {
+    const router = useRouter();
     const formRef = useRef<FormRef>(null);
     const submitButtonOptions = {
         type: "success",
@@ -44,7 +49,12 @@ const login = () => {
         onClick: function () {
             const validationResult = formRef.current?.instance().validate();
             if (validationResult?.isValid){
-                alert("hhhh");
+                Login("login",formData).then((reponse) => {
+                    var accessToken = reponse.Data.data.Accesstoken;
+                    SetCookie(accessToken);
+                    router.push('/');
+                    
+                });
             }
         }
     };
