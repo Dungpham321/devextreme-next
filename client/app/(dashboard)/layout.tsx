@@ -14,7 +14,7 @@ export default function AdminLayout({children,}: {children: React.ReactNode;}) {
   const mainContentMargin = isMobileOpen? "ml-0": isExpanded || isHovered? "lg:ml-[290px]": "lg:ml-[90px]";
   useEffect(() => {
     const token = GetCookie();
-    settoken(token);
+    settoken(token)
     if(token != null){
         router.push('/');
     }else{
