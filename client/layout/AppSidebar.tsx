@@ -97,7 +97,6 @@ const othersItems: NavItem[] = [
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
-
   const renderMenuItems = (navItems: NavItem[], menuType: "main" | "others") => {
     return (
       <ul className="flex flex-col gap-4">
@@ -213,9 +212,6 @@ const AppSidebar: React.FC = () => {
       </ul>
     );
   }
-
-
-
   const [openSubmenu, setOpenSubmenu] = useState<{
     type: "main" | "others";
     index: number;
@@ -294,10 +290,7 @@ const AppSidebar: React.FC = () => {
       onMouseEnter={() => !isExpanded && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div
-        className={`py-8 flex  ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
-          }`}
-      >
+      <div className={`py-8 flex  ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"}`}>
         <Link href="/">
           {isExpanded || isHovered || isMobileOpen ? (
             <>
@@ -358,12 +351,11 @@ const AppSidebar: React.FC = () => {
                   <HorizontaLDots />
                 )}
               </h2>
-              {/* {renderMenuItems(othersItems, "others")} */}
+              {renderMenuItems(othersItems, "others")}
             </div>
 
           </div>
         </nav>
-        {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
       </div>
     </section>
   );
