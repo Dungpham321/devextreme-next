@@ -1,7 +1,6 @@
 "use client";
-import React, { useCallback, useRef } from 'react'
+import React, { useRef} from 'react'
 import Style from './login.module.css';
-import { ValidationRule } from 'devextreme-react/common';
 import Form, {
     ButtonItem,
     GroupItem,
@@ -19,15 +18,14 @@ import Form, {
     Item,
     FormRef,
 } from 'devextreme-react/form';
-import { Button } from 'devextreme-react/button';
 import 'devextreme-react/text-area';
 import 'devextreme-react/autocomplete';
 import 'devextreme-react/date-range-box';
 import 'devextreme/dist/css/dx.light.css';
-import {Login, getUser} from '@/connect/ApiContext';
+import { Login } from '@/connect/ApiContext';
 import { SetCookie } from '@/components/auth/cookies';
 import { useRouter } from 'next/navigation';
-
+import { useToast } from '@/components/devextreme/Toast_custom';
 const passwordOptions = {
     mode: 'password',
     placeholder: 'Nhập mật khẩu', // Optional: add a placeholder
@@ -39,22 +37,26 @@ const formData = {
     ten_dang_nhap: null,
     mat_khau: null
 }
-
 const login = () => {
     const router = useRouter();
     const formRef = useRef<FormRef>(null);
+    const { triggerToast } = useToast();
     const submitButtonOptions = {
         type: "success",
         text: "Đăng nhập",
         onClick: function () {
             const validationResult = formRef.current?.instance().validate();
-            if (validationResult?.isValid){
+            if (validationResult?.isValid) {
                 Login("login",formData).then((reponse) => {
-                    var accessToken = reponse.Data.data.Accesstoken;
-                    SetCookie(accessToken);
+                    var accessToken = reponse.Data.data;
+                    localStorage.setItem('user', JSON.stringify(accessToken));
+                    SetCookie(accessToken.Accesstoken);
                     router.push('/');
-                    
+                    triggerToast('Đăng nhập thành công', 'success');
                 });
+                Object.assign(formData, {ten_dang_nhap:'',mat_khau:''})
+                formRef.current?.instance().repaint();
+
             }
         }
     };
@@ -71,7 +73,7 @@ const login = () => {
                         <Label text='Mật khẩu' />
                         <RequiredRule message="Mật khẩu là thông tin cần nhập" />
                     </SimpleItem>
-                     <Item itemType="button" buttonOptions={submitButtonOptions} horizontalAlignment={'center'}/>
+                    <Item itemType="button" buttonOptions={submitButtonOptions} horizontalAlignment={'center'} />
                 </Form>
             </div>
         </div>

@@ -1,31 +1,43 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { DeleteCookie } from "../auth/cookies";
 import { useRouter } from 'next/navigation';
-
 export default function UserDropdown() {
-const [isOpen, setIsOpen] = useState(false);
-const router = useRouter();
-function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-  e.stopPropagation();
-  setIsOpen((prev) => !prev);
-}
+  interface UserType {
+    id: string;
+    ten_dang_nhap: string;
+    email: string;
+  }
+  const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
+  const [user, setUser] = useState<UserType>();
+  function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    e.stopPropagation();
+    setIsOpen((prev) => !prev);
+  }
+  function closeDropdown() {
+    setIsOpen(false);
+  }
+  function Dangxuat() {
+    DeleteCookie();
+    localStorage.removeItem('user');
+    router.push("/login");
+  }
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
 
-function closeDropdown() {
-  setIsOpen(false);
-}
-function Dangxuat(){
-  DeleteCookie();
-  router.push("/login");
-}
   return (
     <div className="relative">
       <button
-        onClick={toggleDropdown} 
+        onClick={toggleDropdown}
         className="flex items-center text-gray-700 dark:text-gray-400 dropdown-toggle"
       >
         <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
@@ -37,12 +49,11 @@ function Dangxuat(){
           />
         </span>
 
-        <span className="block mr-1 font-medium text-theme-sm">Musharof</span>
+        <span className="block mr-1 font-medium text-theme-sm">{user?.ten_dang_nhap}</span>
 
         <svg
-          className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+            }`}
           width="18"
           height="20"
           viewBox="0 0 18 20"
@@ -65,10 +76,10 @@ function Dangxuat(){
       >
         <div>
           <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            Musharof Chowdhury
+            {user?.ten_dang_nhap}
           </span>
           <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-            randomuser@pimjo.com
+            {user?.email}
           </span>
         </div>
 

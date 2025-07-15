@@ -19,6 +19,7 @@ module.exports = class DangNhapController extends baseController{
                     };
                     const token = this.CreateToken(datatoken);
                     const Data = {
+                        id: objHT_NGUOIDUNG._id,
                         ten_dang_nhap: objHT_NGUOIDUNG.ten_dang_nhap,
                         email: objHT_NGUOIDUNG.email,
                         Accesstoken: token
