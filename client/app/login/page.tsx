@@ -51,7 +51,7 @@ const login = () => {
                     var accessToken = reponse.Data.data;
                     localStorage.setItem('user', JSON.stringify(accessToken));
                     SetCookie(accessToken.Accesstoken);
-                    router.push('/');
+                    router.push('/admin');
                     triggerToast('Đăng nhập thành công', 'success');
                 });
                 Object.assign(formData, {ten_dang_nhap:'',mat_khau:''})
