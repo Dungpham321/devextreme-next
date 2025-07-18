@@ -769,3 +769,6 @@ span.flatpickr-weekday,
    @apply !border-x-0 border-t !border-gray-200 bg-gray-50 !text-left dark:!border-gray-800 dark:bg-gray-900;
    @apply  text-gray-700 dark:text-white/90;
 }
+.Title_content{
+  @apply  text-gray-700 dark:text-white/90;
+}

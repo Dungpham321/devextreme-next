@@ -1,10 +1,12 @@
-const HT_MENU = require("../../models/HT_MENU");
+const HT_MENU_ITEM = require("../../models/HT_MENU_ITEM");
 const baseController = require("../baseController");
-module.exports = class HT_MENUController extends baseController {
+module.exports = class HT_MENU_ITEMController extends baseController {
     get = async (req, res) => {
         const op = req.params.op;
         if (op == "List") {
-            const data = await this.ListAll(HT_MENU, req);
+            const mid = req.query.MID;
+            console.log(mid);
+            const data = await this.ListAllDK(HT_MENU_ITEM, req, mid,'MID');
             // this.db.UserCollection.GetAllUser();
             return this.ObjectResult(res, data);
         }

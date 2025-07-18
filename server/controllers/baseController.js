@@ -1,7 +1,7 @@
 
 const DBContext = require('../models/DBContext');
 const { RequestState } = require('../Library/Enum');
-const { Model } = 'mongoose';
+const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 module.exports = class baseController {
@@ -136,8 +136,39 @@ module.exports = class baseController {
         } else {
             items = await model.find(query).skip(skip).limit(take);
         }
+        const totalCount = await model.countDocuments(query);
+        return { items, totalCount };
+    }
+    ListAllDK = async (model, req, par, key) => {
+        const skip = parseInt(req.query.skip) || 1;
+        const take = parseInt(req.query.take) || 10;
+        let sort = req.query.sort;
+        const params = par
+        const rawFilter = req.query.filter ? JSON.parse(req.query.filter) : [];
+        let query = {};
+        if (!mongoose.Types.ObjectId.isValid(params)) {
+            throw new Error('MID không hợp lệ');
+        }
+        query = {[key]: new mongoose.Types.ObjectId(params) };
+        query = this.buildMongoQueryFromFilter(rawFilter, model.schema);
+        var items;
+        if (sort) {
+            try {
+                const sortParsed = JSON.parse(sort);
+                if (Array.isArray(sortParsed) && sortParsed.length > 0) {
+                    const firstSort = sortParsed[0];
+                    const field = firstSort.selector;
+                    const order = firstSort.desc ? -1 : 1;
+                    sort = { [field]: order };
+                    items = await model.find(query).sort(sort).skip(skip).limit(take);
 
-
+                }
+            } catch (err) {
+                console.warn('Lỗi parse sort:', err.message);
+            }
+        } else {
+            items = await model.find(query).skip(skip).limit(take);
+        }
         const totalCount = await model.countDocuments(query);
         return { items, totalCount };
     }
