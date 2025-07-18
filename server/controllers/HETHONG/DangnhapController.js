@@ -1,8 +1,8 @@
 const json = require("body-parser/lib/types/json");
-const user = require("../models/user");
-const baseController = require("./baseController");
+const user = require("../../models/user");
+const baseController = require("../baseController");
 const bcrypt = require('bcrypt');
-const { RequestState } = require("../Library/Enum");
+const { RequestState } = require("../../Library/Enum");
 
 module.exports = class DangNhapController extends baseController{
     post = async(req,res) =>{

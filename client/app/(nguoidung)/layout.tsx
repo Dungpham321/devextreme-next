@@ -18,7 +18,7 @@ export default function AdminLayout({children,}: {children: React.ReactNode;}) {
 
         <AppHeaderND />
         {/* Page Content */}
-        <div className="min-h-screen flex flex-col">{children}</div>
+        <div className="min-h-screen flex">{children}</div>
         <AppFooterND/>
     </div>
   );

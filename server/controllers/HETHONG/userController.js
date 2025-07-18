@@ -1,11 +1,12 @@
-const user = require("../models/user");
-const baseController = require("./baseController");
+const user = require("../../models/user");
+const baseController = require("../baseController");
 const bcrypt = require('bcrypt');
 module.exports = class userController extends baseController {
     get = async (req, res) => {
         const op = req.params.op;
         if (op == "List") {
-            const data = await this.db.UserCollection.GetAllUser();
+            const data = await this.ListAll(user, req);
+            // this.db.UserCollection.GetAllUser();
             return this.ObjectResult(res, data);
 
         } else if (op == "tendangnhap") {

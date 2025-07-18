@@ -9,6 +9,8 @@ import type { LocateInMenuMode, ShowTextMode } from "devextreme/ui/toolbar";
 import type { ToolbarItemLocation, ToolbarItemComponent } from "devextreme/common";
 import { jsPDF } from 'jspdf';
 import { exportDataGrid } from 'devextreme/pdf_exporter';
+
+
 type ChildProps = {
   Title:string;
   dataSource: {};
@@ -19,6 +21,8 @@ type ChildProps = {
   e: boolean;
   d: boolean;
   c: boolean;
+  popupWidth:number, 
+  popupHeight:number
 };
 const colMap: Record<string, any> = {
   df: "dataField",
@@ -138,7 +142,9 @@ const Addcolumn = ({ items }: { items: any[] }) => {
   );
 
 };
-const Grid_custom = forwardRef<DataGridRef, ChildProps>((props: ChildProps, gridRef) => {
+const 
+
+Grid_custom = forwardRef<DataGridRef, ChildProps>((props: ChildProps, gridRef) => {
   const allowedPageSizes = [10, 100, 200];
   const notesEditorOptions = { height: 100 };
   const [toolbars, settoolbars] = useState(props.toolbars || []);
@@ -148,6 +154,8 @@ const Grid_custom = forwardRef<DataGridRef, ChildProps>((props: ChildProps, grid
   const [visibleEdit, setvisibleEdit] = useState(props.e);
   const [visibleDelete, setvisibleDelete] = useState(props.d);
   const [visibleCopy, setvisibleCopy] = useState(props.c || false);
+  const [height, setheight] = useState(props.popupHeight || 500);
+  const [width, setwidth] = useState(props.popupWidth || 700);
   //end
   const selectedChanged = useCallback((e: DataGridTypes.SelectionChangedEvent) => {
     setSelectedRowIndex(e.component.getRowIndexByKey(e.selectedRowKeys[0]));
@@ -276,7 +284,7 @@ const Grid_custom = forwardRef<DataGridRef, ChildProps>((props: ChildProps, grid
   }
   return (
     <div className='m-[10px] '>
-      <div className='Title_content font-bold text-lg'>
+      <div className='Title_content text-lg'>
         {props.Title}
       </div>
       <div className='dataGrid'>
@@ -296,17 +304,18 @@ const Grid_custom = forwardRef<DataGridRef, ChildProps>((props: ChildProps, grid
           onToolbarPreparing={onToolbarPreparing}
           onSelectionChanged={selectedChanged}
           allowColumnResizing={true}
+          remoteOperations={true}
         >
           {/* columns */}
           <Addcolumn items={props.cols} />
           {/* end */}
 
-          <Paging defaultPageSize={10} />
+          <Paging defaultPageSize={5} />
           <Pager visible={true} showPageSizeSelector={true} allowedPageSizes={allowedPageSizes} />
           <Selection mode="multiple" selectAllMode={"allPages"} showCheckBoxesMode={"onClick"} />
           <SearchPanel visible={true} placeholder="Tra cứu" width={280} />
           <Editing mode="popup">
-            <Popup title="Thêm mới" showTitle={true} width={700} height={525} />
+            <Popup title="Thêm mới" showTitle={true} width={width} height={height} />
             <Form>
               <Addcolumn items={props.cols} />
             </Form>

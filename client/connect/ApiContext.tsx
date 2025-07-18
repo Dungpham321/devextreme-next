@@ -6,8 +6,11 @@ async function getUser(url: string) {
     const response = await axiosAuth.get(apiUrl + url);
     return { Data: response.data };
 }
-async function Login(url:string, formdata:object) {
+async function Login(url: string, formdata: object) {
     const response = await axios.post(apiUrl + url, formdata);
     return { Data: response.data };
 }
-export { getUser, Login}
+export {
+    getUser,
+    Login
+}

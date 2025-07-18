@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-
+import { FaceBookIcon } from "@/icons";
 const AppFooterND: React.FC = () => {
     const [open, setOpen] = useState(false);
     return (
@@ -38,9 +38,9 @@ const AppFooterND: React.FC = () => {
                 </div>
 
                 <div className="flex space-x-3">
-                    <a href="#"><img src="/zalo-icon.png" alt="Zalo" className="h-6 w-6" /></a>
-                    <a href="#"><img src="/youtube-icon.png" alt="YouTube" className="h-6 w-6" /></a>
-                    <a href="#"><img src="/facebook-icon.png" alt="Facebook" className="h-6 w-6" /></a>
+                    <a href="#"><img src="/images/icons/icons8-zalo-48.png" alt="Zalo" className="h-6 w-6" /></a>
+                    <a href="#"><img src="/images/icons/icon-youtube-48.png" alt="YouTube" className="h-6 w-6" /></a>
+                    <a href="#"><img src="/images/icons/icon-facebook-48.png" alt="YouTube" className="h-6 w-6" /></a>
                 </div>
             </div>
 

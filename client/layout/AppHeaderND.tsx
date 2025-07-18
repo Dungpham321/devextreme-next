@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 const AppHeaderND: React.FC = () => {
     const [open, setOpen] = useState(false);
     return (
-        <header className="bg-white shadow-md">
+        <header className="sticky top-0 bg-white shadow-md">
             <div className="max-w-screen-xl mx-auto px-4 py-3 grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
                 {/* Logo và thông tin bệnh viện */}
                 <div className="flex items-center space-x-4">
@@ -29,7 +29,7 @@ const AppHeaderND: React.FC = () => {
                         <a href="#" className="text-green-600 font-medium hover:underline">Đăng nhập</a>
                         <button className="flex items-center space-x-1 border px-2 py-1 rounded hover:bg-gray-100">
                             <img src="/uk-flag.png" alt="English" className="h-4 w-6 object-cover" />
-                            <span>English</span>
+                            <span>Tiếng việt</span>
                         </button>
                     </div>
                     <div className="col-span-full flex justify-end">
