@@ -107,7 +107,7 @@ module.exports = class baseController {
         return query;
     }
     ListAll = async (model, req) => {
-        const skip = parseInt(req.query.skip) || 1;
+        const skip = parseInt(req.query.skip) || 0;
         const take = parseInt(req.query.take) || 10;
         let sort = req.query.sort;
         const defaultSort = req.query.defaultSort;
@@ -116,8 +116,10 @@ module.exports = class baseController {
         const searchValue = req.query.searchValue;
         const jFields = JSON.parse(req.query.fields);
         const rawFilter = req.query.filter ? JSON.parse(req.query.filter) : [];
-        let query = {};
-        query = this.buildMongoQueryFromFilter(rawFilter, model.schema);
+        const query = {};
+        if(rawFilter.length){
+            query = this.buildMongoQueryFromFilter(rawFilter, model.schema);
+        }
         var items;
         if (sort) {
             try {
@@ -128,19 +130,19 @@ module.exports = class baseController {
                     const order = firstSort.desc ? -1 : 1;
                     sort = { [field]: order };
                     items = await model.find(query).sort(sort).skip(skip).limit(take);
-
                 }
             } catch (err) {
                 console.warn('Lỗi parse sort:', err.message);
             }
         } else {
-            items = await model.find(query).skip(skip).limit(take);
+            const sortDesc = { 'ngaytao': -1 };
+            items = await model.find(query).sort(sortDesc).skip(skip).limit(take);
         }
         const totalCount = await model.countDocuments(query);
         return { items, totalCount };
     }
     ListAllDK = async (model, req, par, key) => {
-        const skip = parseInt(req.query.skip) || 1;
+        const skip = parseInt(req.query.skip) || 0;
         const take = parseInt(req.query.take) || 10;
         let sort = req.query.sort;
         const params = par
@@ -149,8 +151,11 @@ module.exports = class baseController {
         if (!mongoose.Types.ObjectId.isValid(params)) {
             throw new Error('MID không hợp lệ');
         }
-        query = {[key]: new mongoose.Types.ObjectId(params) };
-        query = this.buildMongoQueryFromFilter(rawFilter, model.schema);
+           query = { [key]: new mongoose.Types.ObjectId(params) };
+        if (rawFilter.length) {
+           const queryFilter = this.buildMongoQueryFromFilter(rawFilter, model.schema);
+           query = { ...query, ...queryFilter }; 
+        }
         var items;
         if (sort) {
             try {
@@ -169,6 +174,7 @@ module.exports = class baseController {
         } else {
             items = await model.find(query).skip(skip).limit(take);
         }
+
         const totalCount = await model.countDocuments(query);
         return { items, totalCount };
     }

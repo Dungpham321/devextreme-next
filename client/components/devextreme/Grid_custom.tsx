@@ -62,7 +62,7 @@ const colMap: Record<string, any> = {
   eov: "editorOptions.value",
   fx: "fixed",
   fxp: "fixedPosition",
-  ect: "editCellTemplate",
+  ect: "editCellComponent",
   ct: "cellTemplate",
   edph: "editorOptions.placeholder",
   edsc: "editorOptions.showClearButton",
@@ -117,7 +117,7 @@ const buildColumn = (c: any, op: any) => {
   if (c.hasOwnProperty("lds")) {
     col.lookup = {
       dataSource: c.lds,
-      valueExpr: c.lve != null ? c.lve : "ID",
+      valueExpr: c.lve != null ? c.lve : "_id",
       displayExpr: function (item: any) { return item && lookUpDisplay(item, (c.lde != null ? c.lde : "TEN")) },
     };
     col.editorOptions.showClearButton = true;
@@ -358,7 +358,7 @@ const Grid_custom = forwardRef<DataGridRef, ChildProps>((props: ChildProps, grid
             <Pager visible={true} showPageSizeSelector={true} allowedPageSizes={allowedPageSizes} />
             <Selection mode="multiple" selectAllMode={"allPages"} showCheckBoxesMode={"onClick"} />
             <SearchPanel visible={true} placeholder="Tra cứu" width={280} />
-            <Editing mode="popup">
+            <Editing mode="popup" >
               <Popup title="Thêm mới" showTitle={true} width={width} height={height} />
               <Form>
                 <Addcolumn items={props.cols} />

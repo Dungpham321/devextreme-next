@@ -9,6 +9,10 @@ module.exports = class HT_MENU_ITEMCollection extends Collection {
         const result = await HT_MENU_ITEM.findOne({ _id: this.ObjectId(id) });
         return result;
     }
+    async GetByMID(MID){
+        const result = await HT_MENU_ITEM.find({ MID: this.ObjectId(MID) });
+        return result;
+    }
     async Create(item) {
        const newMenu =  await HT_MENU_ITEM.create(item);
        return newMenu;

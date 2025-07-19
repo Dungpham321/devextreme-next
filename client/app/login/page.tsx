@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef} from 'react'
+import React, { useRef } from 'react'
 import Style from './login.module.css';
 import Form, {
     ButtonItem,
@@ -47,14 +47,14 @@ const login = () => {
         onClick: function () {
             const validationResult = formRef.current?.instance().validate();
             if (validationResult?.isValid) {
-                Login("login",formData).then((reponse) => {
-                    var accessToken = reponse.Data.data;
+                Login("login", formData).then((reponse) => {
+                    var accessToken = reponse.Data.Data;
                     localStorage.setItem('user', JSON.stringify(accessToken));
                     SetCookie(accessToken.Accesstoken);
-                    router.push('/admin');
                     triggerToast('Đăng nhập thành công', 'success');
+                    router.push('/admin');
                 });
-                Object.assign(formData, {ten_dang_nhap:'',mat_khau:''})
+                Object.assign(formData, { ten_dang_nhap: '', mat_khau: '' })
                 formRef.current?.instance().repaint();
 
             }

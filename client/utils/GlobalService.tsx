@@ -84,7 +84,17 @@ export async function OnLoad (loadOptions: any, url: string, fields: any, keys: 
     const result: RequestResult | undefined = await GetData(url, parameters);
     return result ? { data: result["Data"]["items"], totalCount: result["Data"]["totalCount"] } : result;
 }
-
+export async function OnLoadP (loadOptions: any, url: string, fields: any, keys: any, defaultSort: any, exParamerter: any) {
+    var parameters = {
+        fields: JSON.stringify(fields),
+        keys: JSON.stringify(keys),
+        defaultSort: JSON.stringify(defaultSort),
+        requireTotalCount: false
+    } as LoadOptionsP;
+    Object.assign(parameters, exParamerter || {});
+    const result: RequestResult | undefined = await GetData(url, parameters);
+    return result ? result["Data"]["items"] : result;
+};
 export function DataSource (u: any, k: any, f: any, s: any, exOps = {}) {//url, key, field, sort, ex ops
     let op = {
         ul: "/List",
@@ -141,7 +151,33 @@ export function DataSource (u: any, k: any, f: any, s: any, exOps = {}) {//url, 
     });
     return data;
 };
-
+export function DataSourceP (u: any, k: any, f: any, s: any, exOps = {}) {//url, key, field, sort, ex ops
+    let op = {
+        ulo: function () { return null; },
+        bl: function () { },
+        al: function (response: any) { },
+        lm: "raw",
+        ca: true,
+        bk: undefined,
+    };
+    op = Object.assign(op, exOps);
+    const data = {items: [], data: {}};
+    data.data = new CustomStore({
+        key: k.length == 1 ? k[0] : k,
+        loadMode: "raw",
+        async load (loadOptions) {
+            op.bl();
+            let result = await OnLoadP(loadOptions, u, f, k, s, op.ulo());
+            if(result) data.items = result["data"];
+            else throw 'Lỗi tải dữ liệu';
+            op.al(result);
+            return result;
+        },
+        byKey: op.bk,
+        cacheRawData: op.ca
+    });
+    return data;
+};
 // export function createCustomDataSource(url: string, extraParams: { userId?: string; status?: string }) {
 //     return new CustomStore({
 //         key: '_id',

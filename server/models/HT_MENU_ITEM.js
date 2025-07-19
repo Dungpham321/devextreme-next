@@ -8,6 +8,6 @@ const HT_MENU_ITEMSchema = new mongoose.Schema({
  WEIGHT:{type:String},
  HIDEN:{type:Boolean},
  ICON:{type:String},
- NGAYTAO: {type: Date, default: Date.now}
+ ngaytao: {type: Date, default: Date.now}
 });
 module.exports = mongoose.model("HT_MENU_ITEM",HT_MENU_ITEMSchema, 'HT_MENU_ITEM');
