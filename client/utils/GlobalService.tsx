@@ -1,6 +1,8 @@
 // utils/customDataSource.ts
 import CustomStore from 'devextreme/data/custom_store';
 import axiosAuth from '@/utils/Axios';
+import { GetCookie } from '@/components/auth/cookies';
+import { useToast } from '@/components/devextreme/Toast_custom';
 const URL_API = process.env.NEXT_PUBLIC_URL_API;
 
 interface LoadOptions {
@@ -27,7 +29,14 @@ interface LoadOptionsP {
 interface RequestResult {
     Data: ResultData | any;
 }
-
+interface ApiResponse<T = any> {
+    status: number;
+    data?: {
+        Msg?: string;
+        State?: number;
+        [key: string]: any;
+    };
+}
 interface ResultData {
     items: any;
     totalCount: number;
@@ -35,7 +44,7 @@ interface ResultData {
 export async function GetData(url: string, data: object | null) {
     let resData;
     let status = 0;
-    await axiosAuth.get(URL_API + url, {params: data}).then(function(response){
+    await axiosAuth.get(URL_API + url, { params: data }).then(function (response) {
         resData = response.data;
     }).catch((resp) => {
         status = resp.status;
@@ -45,7 +54,7 @@ export async function GetData(url: string, data: object | null) {
 }
 export async function PostData(url: string, data: object | null) {
     let resData;
-    await axiosAuth.post(URL_API + url, data).then(function(response){
+    await axiosAuth.post(URL_API + url, data).then(function (response) {
         resData = response.data;
     });
     return resData;
@@ -53,7 +62,7 @@ export async function PostData(url: string, data: object | null) {
 
 export async function PutData(url: string, data: object | null) {
     let resData;
-    await axiosAuth.put(URL_API + url, data).then(function(response){
+    await axiosAuth.put(URL_API + url, data).then(function (response) {
         resData = response.data;
     });
     return resData;
@@ -61,12 +70,12 @@ export async function PutData(url: string, data: object | null) {
 
 export async function DeleteData(url: string, data: object | null) {
     let resData;
-    await axiosAuth.delete(URL_API + url, {data: data}).then(function(response){
+    await axiosAuth.delete(URL_API + url, { data: data }).then(function (response) {
         resData = response.data;
     });
     return resData;
 }
-export async function OnLoad (loadOptions: any, url: string, fields: any, keys: any, defaultSort: any, exParamerter: any) {
+export async function OnLoad(loadOptions: any, url: string, fields: any, keys: any, defaultSort: any, exParamerter: any) {
     let parameters = {
         fields: JSON.stringify(fields),
         keys: JSON.stringify(keys),
@@ -84,7 +93,7 @@ export async function OnLoad (loadOptions: any, url: string, fields: any, keys: 
     const result: RequestResult | undefined = await GetData(url, parameters);
     return result ? { data: result["Data"]["items"], totalCount: result["Data"]["totalCount"] } : result;
 }
-export async function OnLoadP (loadOptions: any, url: string, fields: any, keys: any, defaultSort: any, exParamerter: any) {
+export async function OnLoadP(loadOptions: any, url: string, fields: any, keys: any, defaultSort: any, exParamerter: any) {
     var parameters = {
         fields: JSON.stringify(fields),
         keys: JSON.stringify(keys),
@@ -95,7 +104,7 @@ export async function OnLoadP (loadOptions: any, url: string, fields: any, keys:
     const result: RequestResult | undefined = await GetData(url, parameters);
     return result ? result["Data"]["items"] : result;
 };
-export function DataSource (u: any, k: any, f: any, s: any, exOps = {}) {//url, key, field, sort, ex ops
+export function DataSource(u: any, k: any, f: any, s: any, exOps = {}) {//url, key, field, sort, ex ops
     let op = {
         ul: "/List",
         ulo: function () { return null },
@@ -114,18 +123,18 @@ export function DataSource (u: any, k: any, f: any, s: any, exOps = {}) {//url, 
         err: function (error: any) { },
     };
     op = Object.assign(op, exOps);
-    const data = {items: [], data: {}};
+    const data = { items: [], data: {} };
     data.data = new CustomStore({
         key: k.length == 1 ? k[0] : k,
-        async load (loadOptions) {            
+        async load(loadOptions) {
             op.bl();
             let result = await OnLoad(loadOptions, u + op.ul, f, k, s, op.ulo());
-            if(result) data.items = result["data"];
+            if (result) data.items = result["data"];
             else throw 'Lỗi tải dữ liệu';
             op.al(result);
             return result;
         },
-        async update (key, values) {
+        async update(key, values) {
             var key_url = key;
             if (typeof key === 'object') {
                 key_url = "";
@@ -139,7 +148,7 @@ export function DataSource (u: any, k: any, f: any, s: any, exOps = {}) {//url, 
             let result = await PutData(u + op.uu + "/" + key_url, values);
             return result;
         },
-        async insert (values) {
+        async insert(values) {
             op.bi(values);
             let result = await PostData(u + op.ui, values);
             op.ai(result);
@@ -147,11 +156,11 @@ export function DataSource (u: any, k: any, f: any, s: any, exOps = {}) {//url, 
         },
         byKey: op.bk,
         cacheRawData: op.ca,
-        errorHandler: (error:any) => {  op.err(error); }
+        errorHandler: (error: any) => { op.err(error); }
     });
     return data;
 };
-export function DataSourceP (u: any, k: any, f: any, s: any, exOps = {}) {//url, key, field, sort, ex ops
+export function DataSourceP(u: any, k: any, f: any, s: any, exOps = {}) {//url, key, field, sort, ex ops
     let op = {
         ulo: function () { return null; },
         bl: function () { },
@@ -161,14 +170,14 @@ export function DataSourceP (u: any, k: any, f: any, s: any, exOps = {}) {//url,
         bk: undefined,
     };
     op = Object.assign(op, exOps);
-    const data = {items: [], data: {}};
+    const data = { items: [], data: {} };
     data.data = new CustomStore({
         key: k.length == 1 ? k[0] : k,
         loadMode: "raw",
-        async load (loadOptions) {
+        async load(loadOptions) {
             op.bl();
             let result = await OnLoadP(loadOptions, u, f, k, s, op.ulo());
-            if(result) data.items = result["data"];
+            if (result) data.items = result["data"];
             else throw 'Lỗi tải dữ liệu';
             op.al(result);
             return result;
@@ -178,28 +187,22 @@ export function DataSourceP (u: any, k: any, f: any, s: any, exOps = {}) {//url,
     });
     return data;
 };
-// export function createCustomDataSource(url: string, extraParams: { userId?: string; status?: string }) {
-//     return new CustomStore({
-//         key: '_id',
-//         load: async (loadOptions: LoadOptions<any>) => {
-//             const params: string[] = [];
-//             const keys: (keyof LoadOptions<any>)[] = ['skip', 'take', 'sort', 'filter'];
-//             keys.forEach((key) => {
-//                 if (loadOptions[key]) {
-//                     params.push(`${key}=${JSON.stringify(loadOptions[key])}`);
-//                 }
-//             });
-//             const query = params.join('&');
+//check response
+export const checkResponseStatus = (response: ApiResponse): boolean => {
+    const { triggerToast } = useToast();
+    let result = true;
+    const currentUser = typeof window !== 'undefined' && GetCookie();
+    if (response.status === -1) {
+     
+    } else if (response.status === 401) {
+      
+    } else if (response.status === 404) {
        
-//             try {
-//                 const response = await axiosAuth.get(URL_API + url + `/List?${query}`);
-//                 return {
-//                     data: response.data.data,
-//                     totalCount: response.data.totalCount,
-//                 };
-//             } catch (error) {
-//                 throw 'Data loading error';
-//             }
-//         },
-//     });
-// }
+    } else if (response.status === 500) {
+       
+    } else {
+       
+    }
+    return result;
+};
+

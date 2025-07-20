@@ -19,12 +19,13 @@ import {
   UserCircleIcon,
 } from "../icons/index";
 import SidebarWidget from "./SidebarWidget";
+import { GetCookie } from "@/components/auth/cookies";
 
 type NavItem = {
-  name: string;
+  NAME: string;
   icon: React.ReactNode;
-  path?: string;
-  subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
+  HREF?: string;
+  subItems?: { NAME: string; HREF: string; pro?: boolean; new?: boolean }[];
 };
 
 const navItems: NavItem[] = [
@@ -96,11 +97,15 @@ const othersItems: NavItem[] = [
 ];
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+  const [navItems, setnavItems] = useState([]);
   const pathname = usePathname();
   useEffect(() => {
-    GetData("HT_MENU_ITEM/TreeAdmin",{}).then((reponse) => {
-      console.log(reponse);
-    });
+    if (GetCookie()) {
+      GetData("HT_MENU_ITEM/TreeAdmin", {}).then((reponse: any) => {
+        setnavItems(reponse.Data);
+      });
+    }
+
   }, []);
 
 
@@ -109,8 +114,8 @@ const AppSidebar: React.FC = () => {
     return (
       <ul className="flex flex-col gap-4">
         {navItems.map((nav, index) => (
-          <li key={nav.name}>
-            {nav.subItems ? (
+          <li key={nav.NAME}>
+            {nav.subItems?.length ? (
               <button
                 onClick={() => handleSubmenuToggle(index, menuType)}
                 className={`menu-item group  ${openSubmenu?.type === menuType && openSubmenu?.index === index
@@ -130,7 +135,7 @@ const AppSidebar: React.FC = () => {
                   {nav.icon}
                 </span>
                 {(isExpanded || isHovered || isMobileOpen) && (
-                  <span className={`menu-item-text`}>{nav.name}</span>
+                  <span className={`menu-item-text`}>{nav.NAME}</span>
                 )}
                 {(isExpanded || isHovered || isMobileOpen) && (
                   <ChevronDownIcon
@@ -143,14 +148,14 @@ const AppSidebar: React.FC = () => {
                 )}
               </button>
             ) : (
-              nav.path && (
+              nav.HREF && (
                 <Link
-                  href={nav.path}
-                  className={`menu-item group ${isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
+                  href={nav.HREF}
+                  className={`menu-item group ${isActive(nav.HREF) ? "menu-item-active" : "menu-item-inactive"
                     }`}
                 >
                   <span
-                    className={`${isActive(nav.path)
+                    className={`${isActive(nav.HREF)
                       ? "menu-item-icon-active"
                       : "menu-item-icon-inactive"
                       }`}
@@ -158,7 +163,7 @@ const AppSidebar: React.FC = () => {
                     {nav.icon}
                   </span>
                   {(isExpanded || isHovered || isMobileOpen) && (
-                    <span className={`menu-item-text`}>{nav.name}</span>
+                    <span className={`menu-item-text`}>{nav.NAME}</span>
                   )}
                 </Link>
               )
@@ -178,19 +183,19 @@ const AppSidebar: React.FC = () => {
               >
                 <ul className="mt-2 space-y-1 ml-9">
                   {nav.subItems.map((subItem) => (
-                    <li key={subItem.name}>
+                    <li key={subItem.NAME}>
                       <Link
-                        href={subItem.path}
-                        className={`menu-dropdown-item ${isActive(subItem.path)
+                        href={subItem.HREF}
+                        className={`menu-dropdown-item ${isActive(subItem.HREF)
                           ? "menu-dropdown-item-active"
                           : "menu-dropdown-item-inactive"
                           }`}
                       >
-                        {subItem.name}
+                        {subItem.NAME}
                         <span className="flex items-center gap-1 ml-auto">
                           {subItem.new && (
                             <span
-                              className={`ml-auto ${isActive(subItem.path)
+                              className={`ml-auto ${isActive(subItem.HREF)
                                 ? "menu-dropdown-badge-active"
                                 : "menu-dropdown-badge-inactive"
                                 } menu-dropdown-badge `}
@@ -200,7 +205,7 @@ const AppSidebar: React.FC = () => {
                           )}
                           {subItem.pro && (
                             <span
-                              className={`ml-auto ${isActive(subItem.path)
+                              className={`ml-auto ${isActive(subItem.HREF)
                                 ? "menu-dropdown-badge-active"
                                 : "menu-dropdown-badge-inactive"
                                 } menu-dropdown-badge `}
@@ -240,7 +245,7 @@ const AppSidebar: React.FC = () => {
       items.forEach((nav, index) => {
         if (nav.subItems) {
           nav.subItems.forEach((subItem) => {
-            if (isActive(subItem.path)) {
+            if (isActive(subItem.HREF)) {
               setOpenSubmenu({
                 type: menuType as "main" | "others",
                 index,

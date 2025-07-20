@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef } from 'react'
+import React, { useRef, useEffect } from 'react'
 import Style from './login.module.css';
 import Form, {
     ButtonItem,
@@ -24,7 +24,7 @@ import 'devextreme-react/date-range-box';
 import 'devextreme/dist/css/dx.light.css';
 import { Login } from '@/connect/ApiContext';
 import { SetCookie } from '@/components/auth/cookies';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/components/devextreme/Toast_custom';
 const passwordOptions = {
     mode: 'password',
@@ -39,8 +39,24 @@ const formData = {
 }
 const login = () => {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const formRef = useRef<FormRef>(null);
     const { triggerToast } = useToast();
+    const hasShownToast = useRef(false);
+
+    useEffect(() => {
+        if (hasShownToast.current) return;
+        const toast = searchParams.get('toast');
+        const type = searchParams.get('type');
+        if (toast && type) {
+            triggerToast(toast.toString(), type.toString());
+             hasShownToast.current = true;
+            // Xoá query để tránh toast lặp lại khi reload
+            const cleanURL = window.location.pathname;
+            window.history.replaceState({}, '', cleanURL);
+        }
+    }, []);
+
     const submitButtonOptions = {
         type: "success",
         text: "Đăng nhập",

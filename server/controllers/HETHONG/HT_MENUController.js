@@ -1,6 +1,17 @@
 const HT_MENU = require("../../models/HT_MENU");
 const baseController = require("../baseController");
+const { NhomChucNang, NhomQuyen } = require('../../Library/Enum');
 module.exports = class HT_MENUController extends baseController {
+    constructor() {
+        const nhomQuyen = NhomQuyen.menu;
+        const nhomChucNang = NhomChucNang.QuanTriHeThong;
+        super(nhomQuyen, nhomChucNang); // Truyền biến sang BaseController
+    }
+    static permission() {
+        const ctrl = new HT_MENUController();
+        return ctrl.quyenCoBan(); // hoặc ctrl.quyenCoBan('Xem', 'Sua') nếu muốn cụ thể
+    }
+
     get = async (req, res) => {
         const op = req.params.op;
         if (op == "List") {

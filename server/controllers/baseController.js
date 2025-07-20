@@ -1,12 +1,21 @@
 
 const DBContext = require('../models/DBContext');
 const { RequestState } = require('../Library/Enum');
+const { QuyenEnum } = require('../Library/QuyenEnum');
+const { Quyen } = require('../Library/Quyen');
+const { cleanKey } = require("../Utils/QuyenUtils")
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
+
 module.exports = class baseController {
-    constructor() {
+    constructor(nhomQuyen, nhomChucNang) {
         this.db = new DBContext();
+        this.nhomQuyen = nhomQuyen;
+        this.nhomChucNang = nhomChucNang;
+
     }
     ObjectResult = function (res, data, Code = RequestState.Success, Message = 'Success', statusCode = 200) {
         const response = {
@@ -117,7 +126,7 @@ module.exports = class baseController {
         const jFields = JSON.parse(req.query.fields);
         const rawFilter = req.query.filter ? JSON.parse(req.query.filter) : [];
         const query = {};
-        if(rawFilter.length){
+        if (rawFilter.length) {
             query = this.buildMongoQueryFromFilter(rawFilter, model.schema);
         }
         var items;
@@ -151,10 +160,10 @@ module.exports = class baseController {
         if (!mongoose.Types.ObjectId.isValid(params)) {
             throw new Error('MID không hợp lệ');
         }
-           query = { [key]: new mongoose.Types.ObjectId(params) };
+        query = { [key]: new mongoose.Types.ObjectId(params) };
         if (rawFilter.length) {
-           const queryFilter = this.buildMongoQueryFromFilter(rawFilter, model.schema);
-           query = { ...query, ...queryFilter }; 
+            const queryFilter = this.buildMongoQueryFromFilter(rawFilter, model.schema);
+            query = { ...query, ...queryFilter };
         }
         var items;
         if (sort) {
@@ -177,5 +186,81 @@ module.exports = class baseController {
 
         const totalCount = await model.countDocuments(query);
         return { items, totalCount };
+    }
+    //quyền
+    quyenCoBan(...danhSachQuyen) {
+        const danhSach = danhSachQuyen.length === 0 ? [QuyenEnum.XEM, QuyenEnum.THEM, QuyenEnum.SUA, QuyenEnum.XOA] : danhSachQuyen;
+        return danhSach.map(q => new Quyen(q, this.nhomQuyen, this.nhomChucNang));
+    }
+    // 💡 Hàm tự động quét toàn bộ quyền hệ thống
+    static _lstQUYEN = null;
+    static getSystemPermission(db) {
+        if (this._lstQUYEN) return this._lstQUYEN;
+        const controllersDir = path.join(__dirname);
+        const files = this.scanControllerFiles(path.join(__dirname));
+        // const files = fs.readdirSync(controllersDir);
+        this._lstQUYEN = [];
+
+        for (const file of files) {
+            if (!file.endsWith('.js')) continue;
+            const controllerPath = file;
+            const ctrl = require(controllerPath);
+
+            if (typeof ctrl.permission === 'function') {
+                const rawList = ctrl.permission(); // giả sử trả về mảng { quyen, nhomQuyen, chucNang, sapxep }
+                // const convertedList = rawList.map(item =>
+                //     new Quyen(item.quyen, item.nhomQuyen, item.chucNang, item.sapxep || 0)
+                // );
+                this._lstQUYEN = this._lstQUYEN.concat(rawList);
+
+            }
+        }
+
+        return this._lstQUYEN;
+    }
+    static getSystemPermissionTree(inQuyen = null) {
+        const listPerm = this.getSystemPermission(); // danh sách quyền đầy đủ
+        const data = [];
+        const listChucNang = [...new Set(listPerm.map(p => p.CHUC_NANG))].sort();
+        for (const chucnang of listChucNang) {
+            const chucnangKey = cleanKey(chucnang);
+            // 📌 Mục CHỨC_NĂNG
+            data.push(new Quyen(chucnangKey, '', '', 0));
+            const listNhomQuyen = [...new Set(listPerm.filter(p => p.CHUC_NANG === chucnang).map(p => p.NHOM_QUYEN))].sort();
+            for (const nhomQuyen of listNhomQuyen) {
+                const nhomQuyenKey = cleanKey(nhomQuyen);
+                // 📌 Mục NHÓM_QUYỀN
+                data.push(new Quyen(nhomQuyenKey, '', chucnangKey, 0));
+                const listQuyen = listPerm.filter(p => p.CHUC_NANG === chucnang && p.NHOM_QUYEN === nhomQuyen).sort((a, b) => a.SAP_XEP - b.SAP_XEP);
+                for (const quyen of listQuyen) {
+                    if (inQuyen && !inQuyen.includes(quyen.MA)) continue;
+                    // 📌 Mục QUYỀN CỤ THỂ
+                    data.push(Quyen.fromObject(quyen));
+                }
+            }
+        }
+
+        return data;
+    }
+    static scanControllerFiles(dirPath) {
+        let controllerPaths = [];
+        const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+
+        for (const entry of entries) {
+            const fullPath = path.join(dirPath, entry.name);
+
+            if (entry.isDirectory()) {
+                // 🔁 Đệ quy vào thư mục con
+                controllerPaths = controllerPaths.concat(this.scanControllerFiles(fullPath));
+            } else if (
+                entry.isFile() &&
+                entry.name.endsWith('.js') &&
+                entry.name !== 'BaseController.js'
+            ) {
+                controllerPaths.push(fullPath);
+            }
+        }
+
+        return controllerPaths;
     }
 }

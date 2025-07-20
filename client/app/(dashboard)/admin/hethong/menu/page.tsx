@@ -47,7 +47,7 @@ const MenuPage = () => {
           icon: "detailslayout",
           name: "config",
           onClick(e: DataGridTypes.ColumnButtonClickEvent) {
-            if (e.row) router.push("/menu/" + e.row.data._id);
+            if (e.row) router.push("/admin/hethong/menu/" + e.row.data._id);
           }
         }
       ]

@@ -5,6 +5,7 @@ import { DataSource, DataSourceP } from "@/utils/GlobalService";
 import DataGrid, { DataGridRef, type DataGridTypes } from 'devextreme-react/data-grid';
 import { useRouter, useParams } from 'next/navigation';
 import opsGridDropdownTree from '@/components/devextreme/opsGridDropdownTree';
+import { tree } from 'next/dist/build/templates/app-page';
 interface DataSourceType {
     data: any;
     items: [];
@@ -31,14 +32,10 @@ export default function MenuItem() {
         },
     }) as DataSourceType;
     //dataSourceP
-    const dataCapCha = DataSourceP("HT_MENU_ITEM/List", ["_id"], ["NAME", "PID"], ["PID", "WEIGHT"], {
+    const dataCapCha = useMemo(() => { return DataSourceP("HT_MENU_ITEM/List", ["_id"], ["NAME", "PID"], ["PID", "WEIGHT"], {
         ulo() { return { MID: params.mid } },
-        ca: false
-    }) as DataSourceType;
-    const dataSourCapCha = useMemo(() => {
-         return dataCapCha.data; 
-    }, []);
-
+        ca: true
+    }) as DataSourceType}, [params.mid]);
 
     useEffect(() => {
         // gridRef.current?.instance().option("editing.form.colCount", 1);
@@ -50,7 +47,7 @@ export default function MenuItem() {
     const col = [
         { df: "NAME", c: "Tên", rq: true, w: 150 },
         { df: "HREF", c: "Đường dẫn" },
-        { df: "PID", c: "Cấp cha", lds: dataSourCapCha, lde: "NAME", lve: "_id", ops: { editCellComponent: opsGridDropdownTree } },
+        { df: "PID", c: "Cấp cha", lds: dataCapCha.data, lde: "NAME", lve: "_id", ops: { editCellComponent: opsGridDropdownTree } },
         { df: "PERM", c: "Quyền" },
         { df: "WEIGHT", c: "Vị trí", rq: true, dt: 'number' },
         { df: "ICON", c: "Biểu tượng" },

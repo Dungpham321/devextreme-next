@@ -1,7 +1,17 @@
 const HT_MENU_ITEM = require("../../models/HT_MENU_ITEM");
 const buildTree  = require('../../Utils/treeUtils'); // file xử lý cây
 const baseController = require("../baseController");
+const { NhomChucNang, NhomQuyen } = require('../../Library/Enum');
 module.exports = class HT_MENU_ITEMController extends baseController {
+     constructor() {
+        const nhomQuyen = NhomQuyen.menuitem;
+        const nhomChucNang = NhomChucNang.QuanTriHeThong;
+        super(nhomQuyen, nhomChucNang); // Truyền biến sang BaseController
+    }
+    static permission() {
+        const ctrl = new HT_MENU_ITEMController();
+        return ctrl.quyenCoBan(); // hoặc ctrl.quyenCoBan('Xem', 'Sua') nếu muốn cụ thể
+    }
     get = async (req, res) => {
         const op = req.params.op;
         if (op == "List") {
@@ -13,6 +23,10 @@ module.exports = class HT_MENU_ITEMController extends baseController {
             const data = await this.db.HT_MENU_ITEMCollection.GetByMID(process.env.MENU_ADMIN);
             const nestedTree = buildTree.BuildToData(data);
             return this.ObjectResult(res, nestedTree);
+        }else if(op == "Perm"){
+            const data = await baseController.getSystemPermissionTree();
+            
+             return this.ObjectResult(res, data);
         }
         return this.badrequest(res, "Lỗi kết nối");
     }

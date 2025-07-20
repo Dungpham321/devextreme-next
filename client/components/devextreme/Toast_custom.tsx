@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import Notify from 'devextreme/ui/notify';
 
 export function showToast(message: string, type: string, time: number = 3500,
-    // position: 'top right' | 'top center' = 'top right',
+     position: 'top right' | 'top center' = 'top right',
     direction: 'up-push' | 'down-push' = 'down-push'
 ) {
     const fallbackPosition = { top: 20, right: 20 };
@@ -27,7 +27,7 @@ export function showToast(message: string, type: string, time: number = 3500,
             hide: { type: 'fade', duration: 40, to: 0 },
         },
     }, {
-        position: positionOption,
+        position: position,
         direction: direction,
     });
 }
@@ -36,9 +36,10 @@ export function useToast() {
     const [toastId, setToastId] = useState(1);
     const triggerToast = useCallback(
         (message: string, type: string, time?: number,
+            position?: 'top right' | 'top center',
             direction?: 'up-push' | 'down-push',
         ) => {
-            showToast(message, type, time || 3500, direction || 'down-push');
+            showToast(message, type, time || 3500, position || "top right" , direction || 'down-push');
             setToastId((prev) => prev + 1);
         },
         [toastId]
