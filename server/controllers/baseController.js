@@ -35,6 +35,9 @@ module.exports = class baseController {
         };
         return res.status(statusCode).json(response);
     };
+    NoContentResult = function(res, Message="no content result", statusCode = 204){
+        return res.status(statusCode).json({'Message': Message});
+    }
     CreateToken = function (data = {}) {
         const maxAge = 3 * 60 * 60;
         const jwtSecret = process.env.JWT_SECRET;

@@ -63,12 +63,17 @@ const login = () => {
         onClick: function () {
             const validationResult = formRef.current?.instance().validate();
             if (validationResult?.isValid) {
-                Login("login", formData).then((reponse) => {
-                    var accessToken = reponse.Data.Data;
-                    localStorage.setItem('user', JSON.stringify(accessToken));
-                    SetCookie(accessToken.Accesstoken);
-                    triggerToast('Đăng nhập thành công', 'success');
-                    router.push('/admin');
+                Login("login", formData).then((reponse:any) => {
+                    if(reponse.Data.Code === -1){
+                        triggerToast(reponse.Data.message, 'error');
+                    }else{
+                        var accessToken = reponse.Data.Data;
+                        localStorage.setItem('user', JSON.stringify(accessToken));
+                        SetCookie(accessToken.Accesstoken);
+                        triggerToast('Đăng nhập thành công', 'success');
+                        router.push('/admin');
+                    }
+                   
                 });
                 Object.assign(formData, { ten_dang_nhap: '', mat_khau: '' })
                 formRef.current?.instance().repaint();

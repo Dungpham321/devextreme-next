@@ -38,13 +38,13 @@ module.exports = class HT_NHOMQUYENController extends baseController {
             }
             return this.ObjectResult(res, null);
         }
-        return res.status(204).json({ 'Message': "no content result" });
+        return this.NoContentResult(res);
     }
     put = async (req, res) => {
         const id = req.params.id;
         const data = Object(req.body);
         data.ngaytao = new Date();
         await this.db.HT_NHOMQUYENCollection.Update(id, data);
-        return res.status(204).json({ 'Message': "no content result" });
+        return this.NoContentResult(res);
     }
 }

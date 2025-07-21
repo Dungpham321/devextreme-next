@@ -41,6 +41,7 @@ interface ResultData {
     items: any;
     totalCount: number;
 }
+
 export async function GetData(url: string, data: object | null) {
     let resData;
     let status = 0;
@@ -55,7 +56,7 @@ export async function GetData(url: string, data: object | null) {
 export async function PostData(url: string, data: object | null) {
     let resData;
     await axiosAuth.post(URL_API + url, data).then(function (response) {
-        resData = response.data;
+        resData = response;
     });
     return resData;
 }
@@ -63,7 +64,7 @@ export async function PostData(url: string, data: object | null) {
 export async function PutData(url: string, data: object | null) {
     let resData;
     await axiosAuth.put(URL_API + url, data).then(function (response) {
-        resData = response.data;
+        resData = response;
     });
     return resData;
 }
@@ -105,6 +106,7 @@ export async function OnLoadP(loadOptions: any, url: string, fields: any, keys: 
     return result ? result["Data"]["items"] : result;
 };
 export function DataSource(u: any, k: any, f: any, s: any, exOps = {}) {//url, key, field, sort, ex ops
+    const { triggerToast } = useToast();
     let op = {
         ul: "/List",
         ulo: function () { return null },
@@ -145,14 +147,18 @@ export function DataSource(u: any, k: any, f: any, s: any, exOps = {}) {//url, k
                 key_url = encodeURIComponent(key_url);
             }
             op.bu(key, values);
-            let result = await PutData(u + op.uu + "/" + key_url, values);
+            let result:any = await PutData(u + op.uu + "/" + key_url, values);
+           if (result.status == 204) triggerToast("Cập nhật thành công","success",5000);
             return result;
         },
         async insert(values) {
             op.bi(values);
-            let result = await PostData(u + op.ui, values);
-            op.ai(result);
-            return result;
+            let result: any = await PostData(u + op.ui, values);
+            if (result.status == 204) {
+                triggerToast("Thêm mới thành công","success",5000);
+                op.ai(result);
+                return result;
+            }
         },
         byKey: op.bk,
         cacheRawData: op.ca,
@@ -189,19 +195,19 @@ export function DataSourceP(u: any, k: any, f: any, s: any, exOps = {}) {//url, 
 };
 //check response
 export const checkResponseStatus = (response: ApiResponse): boolean => {
-    const { triggerToast } = useToast();
+   
     let result = true;
     const currentUser = typeof window !== 'undefined' && GetCookie();
     if (response.status === -1) {
-     
+
     } else if (response.status === 401) {
-      
+
     } else if (response.status === 404) {
-       
+
     } else if (response.status === 500) {
-       
+
     } else {
-       
+
     }
     return result;
 };

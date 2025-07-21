@@ -30,20 +30,22 @@ module.exports = class userController extends baseController {
     }
     post = async (req, res) => {
         const op = req.params.op;
-        if (op == "create") {
+        if (op == "Create") {
             const data = Object(req.body);
             const model = user.schema; //model
             const fields = this.Mapfields(model, data);
             fields.mat_khau = await bcrypt.hash(fields.mat_khau, 10);
             fields.ngay_tao = new Date();
             const id = await this.db.UserCollection.Create(fields);
-        } else if (op == "delete") {
-            const Ids = Array(req.body);
-            for (const id of Ids) {
+        } else if (op == "Delete") {
+            const raw = req.body; // hoặc từ query, formData
+            const parsed = typeof raw === 'string' ? JSON.parse(raw.replace(/'/g, '"')) : raw;
+            const ids = JSON.parse(parsed.items); // nếu items là chuỗi JSON  
+            for (const id of ids) {
                 await this.db.UserCollection.Delete(id);
             }
         }
-        return res.status(204).json({ 'Message': "no content result" });
+        return this.NoContentResult(res);
     }
     put = async (req, res) => {
         const id = req.params.id;

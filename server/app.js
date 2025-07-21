@@ -4,11 +4,8 @@ const bodyParser = require('body-parser');
 const app = express();
 const connectDB = require('./db/Connect');
 const PORT = process.env.PORT || 5001;
-const User_router = require("./routes/user");
 const DangNhap_router = require("./routes/DangNhap");
 const verifyJWT = require('./Middleware/verifyJWT');
-const HT_MENU_router = require('./routes/HT_MENU');
-const HT_MENU_ITEM_router = require('./routes/HT_MENU_ITEM');
 const loadRouters = require("./routes/loadRouters");
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -23,10 +20,9 @@ app.use((req, res, next) => {
 // app.use("/api/user",User_router);
 // app.use("/api/HT_MENU",HT_MENU_router);
 // app.use("/api/HT_MENU_ITEM",HT_MENU_ITEM_router);
-// app.use("/api",DangNhap_router);
+app.use("/api",DangNhap_router);
 loadRouters(app);
 app.use(verifyJWT);
-
 
 const start = async () => {
     try {

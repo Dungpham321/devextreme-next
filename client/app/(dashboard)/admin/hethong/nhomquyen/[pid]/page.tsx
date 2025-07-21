@@ -90,7 +90,7 @@ const PhanQuyenPage = () => {
                         text="Lưu lại"
                         type='success'
                         ref={btnRef}
-                        disabled= {true}
+                        //disabled= {true}
                         onClick={(e)=>{
 
                         }}
@@ -114,10 +114,10 @@ const PhanQuyenPage = () => {
                     ref={treeViewRef}
                     visible={true}
                     onItemSelectionChanged={(e)=>{
-                        if(!autoSelect.current)  {
+                       // if(!autoSelect.current)  {
                             btnRef.current?.instance().option('disabled', false);
                             btnRef.current?.instance().repaint();
-                        }
+                        //}
                     }}
                 />
             </div>
