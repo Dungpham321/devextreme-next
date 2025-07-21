@@ -6,6 +6,7 @@ import DataGrid, { DataGridRef, type DataGridTypes } from 'devextreme-react/data
 import { useRouter, useParams } from 'next/navigation';
 import opsGridDropdownTree from '@/components/devextreme/opsGridDropdownTree';
 import { tree } from 'next/dist/build/templates/app-page';
+import opsGridDropdownTrees from '@/components/devextreme/opsGridDropdownTrees';
 interface DataSourceType {
     data: any;
     items: [];
@@ -31,12 +32,19 @@ export default function MenuItem() {
             //if (values.PERM != null && Array.isArray(values.PERM)) values.PERM = values.PERM.join(",");
         },
     }) as DataSourceType;
-    //dataSourceP
-    const dataCapCha = useMemo(() => { return DataSourceP("HT_MENU_ITEM/List", ["_id"], ["NAME", "PID"], ["PID", "WEIGHT"], {
-        ulo() { return { MID: params.mid } },
-        ca: true
-    }) as DataSourceType}, [params.mid]);
+    //dataSourcePs
+    const dataCapCha = useMemo(() => {
+        return DataSourceP("HT_MENU_ITEM/List", ["_id"], ["NAME", "PID"], ["PID", "WEIGHT"], {
+            ulo() { return { MID: params.mid } },
+            ca: true
+        }) as DataSourceType
+    }, [params.mid]);
 
+    const dataPerm = useMemo(() => {
+        return DataSourceP("HT_MENU_ITEM/Perm", ["MA"], ["MA", "TEN", "NHOM_QUYEN", "CHUC_NANG"], ["SAP_XEP"], {
+            ca: true
+        }) as DataSourceType
+    }, []);
     useEffect(() => {
         // gridRef.current?.instance().option("editing.form.colCount", 1);
         gridRef.current?.instance().option("onInitNewRow", (e) => {
@@ -48,8 +56,24 @@ export default function MenuItem() {
         { df: "NAME", c: "Tên", rq: true, w: 150 },
         { df: "HREF", c: "Đường dẫn" },
         { df: "PID", c: "Cấp cha", lds: dataCapCha.data, lde: "NAME", lve: "_id", ops: { editCellComponent: opsGridDropdownTree } },
-        { df: "PERM", c: "Quyền" },
-        { df: "WEIGHT", c: "Vị trí", rq: true, dt: 'number' },
+        {
+            df: "PERM", c: "Quyền", lds: dataPerm.data, lve: 'MA', lde: 'TEN',
+            ops: {
+                cellRender: function (cell: any) {
+                    let str = "";
+                    if (cell.value) {
+                        var ids = cell.value.split(",");
+                        ids.forEach(function (vl: string) {
+                            var vls = vl.split(";");
+                            str += (str == "" ? "" : ", ") + vls[0];
+                        });
+                        return str;
+                    }
+                },
+                editCellComponent:opsGridDropdownTrees
+            }
+        },
+        { df: "WEIGHT", c: "Vị trí", rq: true, dt: 'number'},
         { df: "ICON", c: "Biểu tượng" },
         { df: "HIDEN", c: "Ẩn", dt: 'boolean' },
     ]

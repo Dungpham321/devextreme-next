@@ -2,9 +2,8 @@
 
 import type React from "react";
 import { createContext, useState, useContext, useEffect } from "react";
-
+import themes from 'devextreme/ui/themes';
 type Theme = "light" | "dark";
-
 type ThemeContextType = {
   theme: Theme;
   toggleTheme: () => void;
@@ -34,6 +33,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
         document.documentElement.classList.add("dark");
       } else {
         document.documentElement.classList.remove("dark");
+
       }
     }
   }, [theme, isInitialized]);

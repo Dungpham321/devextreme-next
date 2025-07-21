@@ -772,3 +772,14 @@ span.flatpickr-weekday,
 .Title_content{
   @apply  text-gray-700 dark:text-white/90;
 }
+.dx-treeview-item-content {
+  color: rgb(55 65 81) !important; /* text-gray-700 */
+}
+
+.dark .dx-treeview-item-content {
+  color: rgba(255, 255, 255, 0.9) !important; /* dark:text-white/90 */
+}
+
+.label-text{
+    @apply  text-gray-700 dark:text-white/90;
+}

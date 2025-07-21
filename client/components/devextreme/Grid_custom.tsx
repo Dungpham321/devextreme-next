@@ -369,7 +369,7 @@ const Grid_custom = forwardRef<DataGridRef, ChildProps>((props: ChildProps, grid
           <Addcolumn items={props.cols} />
           {/* end */}
 
-          <Paging defaultPageSize={5} />
+          <Paging defaultPageSize={20} />
           <Pager visible={true} showPageSizeSelector={true} allowedPageSizes={allowedPageSizes} />
           <Selection mode="multiple" selectAllMode={"allPages"} showCheckBoxesMode={"onClick"} />
           <SearchPanel visible={true} placeholder="Tra cứu" width={280} />

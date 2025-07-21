@@ -1,7 +1,17 @@
 const user = require("../../models/user");
 const baseController = require("../baseController");
 const bcrypt = require('bcrypt');
+const { NhomChucNang, NhomQuyen } = require('../../Library/Enum');
 module.exports = class userController extends baseController {
+     constructor() {
+            const nhomQuyen = NhomQuyen.nguoidung;
+            const nhomChucNang = NhomChucNang.QuanTriHeThong;
+            super(nhomQuyen, nhomChucNang); // Truyền biến sang BaseController
+        }
+        static permission() {
+            const ctrl = new userController();
+            return ctrl.quyenCoBan(); // hoặc ctrl.quyenCoBan('Xem', 'Sua') nếu muốn cụ thể
+        }
     get = async (req, res) => {
         const op = req.params.op;
         if (op == "List") {

@@ -7,7 +7,12 @@ import React, { useEffect, useState } from "react";
 import { GetCookie } from "@/components/auth/cookies";
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/devextreme/Toast_custom';
+import viMessages from 'devextreme/localization/messages/vi.json';
+import { loadMessages, locale } from 'devextreme/localization';
+
 export default function AdminLayout({ children, }: { children: React.ReactNode; }) {
+  loadMessages(viMessages);
+  locale('vi');
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
   const [isToken, settoken] = useState<string | null>(null);
   const router = useRouter();

@@ -3,6 +3,10 @@ import './globals.css';
 
 import { SidebarProvider } from '@/context/SidebarContext';
 import { ThemeProvider } from '@/context/ThemeContext';
+
+import 'devextreme/dist/css/dx.light.css';
+// import 'devextreme/dist/css/dx.dark.css';
+
 const outfit = Outfit({
   subsets: ["latin"],
 });

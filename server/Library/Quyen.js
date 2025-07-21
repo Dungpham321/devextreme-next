@@ -9,12 +9,12 @@ class Quyen {
     this.SAP_XEP = sapxep;
   }
   // 💡 Hàm tạo nhanh từ dữ liệu có sẵn
-  static fromObject({ MA, TEN, NHOM_QUYEN, CHUC_NANG, SAP_XEP = 0 }) {
+  static fromObject({ MA, TEN, NHOM_QUYEN, CHUC_NANG, SAP_XEP = 0 }, NoiChuoi) {
     const q = new Quyen('', '', '', SAP_XEP);
     q.MA = MA;
     q.TEN = TEN;
-    q.NHOM_QUYEN = NHOM_QUYEN;
-    q.CHUC_NANG = CHUC_NANG;
+    q.NHOM_QUYEN = "";
+    q.CHUC_NANG = NoiChuoi != ""? NoiChuoi : CHUC_NANG;
     return q;
   }
 

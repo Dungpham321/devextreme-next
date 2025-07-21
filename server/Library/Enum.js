@@ -10,9 +10,19 @@ class NhomChucNang{
 class NhomQuyen{
     static menu = "menu";
     static menuitem = "Liên kết menu";
+    static nguoidung = "Người dùng";
+    static nhomquyen = "Nhóm quyền";
+}
+class DsDoiTuong{
+    static DM_DANHMUC = "DM_DANHMUC";
+}
+class DsChucNang{
+    static NhomQuyen = 'Nhóm quyền'
 }
 module.exports = {
     RequestState,
     NhomChucNang,
-    NhomQuyen
+    NhomQuyen,
+    DsDoiTuong,
+    DsChucNang
 };

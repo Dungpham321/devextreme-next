@@ -225,17 +225,24 @@ module.exports = class baseController {
         for (const chucnang of listChucNang) {
             const chucnangKey = cleanKey(chucnang);
             // 📌 Mục CHỨC_NĂNG
-            data.push(new Quyen(chucnangKey, '', '', 0));
+            // data.push(new Quyen(chucnangKey, '', '', 0));
+            const dataChucNang = {MA: chucnangKey, TEN: chucnang, NHOM_QUYEN:"", CHUC_NANG: "", SAP_XEP: 0};
+            data.push(Quyen.fromObject(dataChucNang, ""));
             const listNhomQuyen = [...new Set(listPerm.filter(p => p.CHUC_NANG === chucnang).map(p => p.NHOM_QUYEN))].sort();
             for (const nhomQuyen of listNhomQuyen) {
                 const nhomQuyenKey = cleanKey(nhomQuyen);
+                const NoiChuoi = nhomQuyenKey+chucnangKey;
+                 const dataNhomQuyen = {MA: NoiChuoi, TEN: nhomQuyen, NHOM_QUYEN:"", CHUC_NANG: chucnangKey, SAP_XEP: 0};
+                  data.push(Quyen.fromObject(dataNhomQuyen, ""));
                 // 📌 Mục NHÓM_QUYỀN
-                data.push(new Quyen(nhomQuyenKey, '', chucnangKey, 0));
+                // data.push(new Quyen(nhomQuyenKey, '', chucnangKey, 0));
                 const listQuyen = listPerm.filter(p => p.CHUC_NANG === chucnang && p.NHOM_QUYEN === nhomQuyen).sort((a, b) => a.SAP_XEP - b.SAP_XEP);
                 for (const quyen of listQuyen) {
                     if (inQuyen && !inQuyen.includes(quyen.MA)) continue;
-                    // 📌 Mục QUYỀN CỤ THỂ
-                    data.push(Quyen.fromObject(quyen));
+                    // 📌 Mục QUYỀN CỤ THỂ cleanKey(nhomQuyen+chucnangKey)
+                    const NoiChuoi = cleanKey(nhomQuyen+chucnangKey);
+                     //data.push(new Quyen(nhomQuyenKey, '', chucnangKey, 0));
+                    data.push(Quyen.fromObject(quyen, NoiChuoi));
                 }
             }
         }
