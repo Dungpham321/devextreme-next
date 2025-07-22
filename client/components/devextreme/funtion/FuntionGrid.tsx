@@ -16,9 +16,3 @@ export const hideGridHeader = (gridRef: RefObject<DataGridRef | null>) => {
   });
   instance.repaint();
 };
-export const noneCheck = (gridRef: RefObject<DataGridRef | null>) => {
-  const instance = gridRef?.current?.instance();
-  if (!instance) return;
-  instance.option('selection.mode', "none");
-  instance.repaint();
-}

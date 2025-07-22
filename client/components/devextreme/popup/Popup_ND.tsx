@@ -4,7 +4,7 @@ import Popup from 'devextreme-react/popup';
 import { Button } from 'devextreme-react/button';
 import DataGrid, { Column, DataGridRef, type DataGridTypes } from 'devextreme-react/data-grid';
 import Grid_custom from "@/components/devextreme/Grid_custom";
-import { hideGridHeader, noneCheck } from '../funtion/FuntionGrid';
+import { hideGridHeader } from '../funtion/FuntionGrid';
 interface PopupNDProps {
     visible: boolean;
     title?: string;
@@ -46,16 +46,15 @@ const PopupND: React.FC<PopupNDProps> = ({
         { _id: 3, ten_dang_nhap: 'Lê Văn C', ho_ten: 'c@example.com' }
     ];
     const col = [
-        { df: "ten_dang_nhap", c: "Tên đăng nhập", rq: true, w: 150 },
-        { df: "ho_ten", c: "Họ tên" },
-        { df: "chon", c: "Chọn",dt:'number' ,ae: true}
+        { df: "ten_dang_nhap", c: "Tên đăng nhập", rq: true, w: 150  ,ae: false},
+        { df: "ho_ten", c: "Họ tên"  ,ae: false},
+        { df: "chon", c: "Chọn",dt:'boolean' ,ae: true}
     ]
     useEffect(() => {
         setTimeout(() => {
             hideGridHeader(gridRef);
-            noneCheck(gridRef);
+            gridRef.current?.instance().option('editing.allowUpdating',true);
         }, 200);
-        
     }, [visible]);
 
     return (
@@ -82,6 +81,8 @@ const PopupND: React.FC<PopupNDProps> = ({
                         d={ChildProps.d}
                         Title={""}
                         ref={gridRef}
+                        selecttion='none'
+                        modeEditting='cell'
                         url=''
                     />
                 </div>
