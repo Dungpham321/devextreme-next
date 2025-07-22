@@ -9,7 +9,6 @@ function loadRouters(app, routePath = "/api", routerDir = path.join(__dirname)) 
         if(routeName.toLowerCase() === "loadrouters") return;
         const mountPath = routeName.toLowerCase() === "dangnhap"? `${routePath}/login`: `${routePath}/${routeName}`;
         app.use(mountPath, router);
-        console.log(mountPath);
     });
 }
 module.exports = loadRouters;

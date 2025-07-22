@@ -1,7 +1,8 @@
+'use client';
 import React, { useCallback, useRef, useState, forwardRef, RefObject } from 'react'
 import DataGrid, {
   Column, Paging, Pager, SearchPanel, Editing, Popup, Form, Selection, type DataGridTypes, Item,
-  Toolbar, Export, DataGridRef, LoadPanel
+  Toolbar, Export, DataGridRef, LoadPanel, Scrolling
 } from 'devextreme-react/data-grid';
 import type { ContentReadyEvent } from 'devextreme/ui/data_grid';
 import 'devextreme-react/text-area';
@@ -156,7 +157,9 @@ const Grid_custom = forwardRef<DataGridRef, ChildProps>((props: ChildProps, grid
   const notesEditorOptions = { height: 100 };
   const [toolbars, settoolbars] = useState(props.toolbars || []);
   const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
+  const [selectedRowKey, setSelectedRowKey] = useState(null);
   const [selectedRowData, setSelectedRowData] = useState([]);
+  const [focusedRowKey, setFocusedRowKey] = useState<number | null>(null);
 
   //accessButton
   const [visibleNew, setvisibleNew] = useState(props.n);
@@ -169,7 +172,6 @@ const Grid_custom = forwardRef<DataGridRef, ChildProps>((props: ChildProps, grid
   const selectedChanged = useCallback((e: DataGridTypes.SelectionChangedEvent) => {
     setSelectedRowIndex(e.component.getRowIndexByKey(e.selectedRowKeys[0]));
   }, [setSelectedRowIndex]);
-
   const toolbarItem = [
     {
       location: "after" as ToolbarItemLocation,
@@ -180,7 +182,7 @@ const Grid_custom = forwardRef<DataGridRef, ChildProps>((props: ChildProps, grid
         icon: "refresh",
         hint: 'Làm mới dữ liệu',
         onClick: function () {
-          refreshDataGrid();
+          (gridRef as RefObject<DataGridRef>).current?.instance().refresh();
         },
       }
     },
@@ -297,12 +299,6 @@ const Grid_custom = forwardRef<DataGridRef, ChildProps>((props: ChildProps, grid
     (gridRef as RefObject<DataGridRef>).current?.instance().editRow(selectedRowIndex);
     (gridRef as RefObject<DataGridRef>).current?.instance().deselectAll();
   }, [gridRef, selectedRowIndex]);
-  //delete
-  const deleteRow = useCallback(() => {
-    (gridRef as RefObject<DataGridRef>).current?.instance().deleteRow(selectedRowIndex);
-    (gridRef as RefObject<DataGridRef>).current?.instance().deselectAll();
-
-  }, [gridRef, selectedRowIndex]);
   //export
   const exportFormats = ['pdf'];
   const onExporting = (e: DataGridTypes.ExportingEvent) => {
@@ -324,27 +320,29 @@ const Grid_custom = forwardRef<DataGridRef, ChildProps>((props: ChildProps, grid
     });
   }
   //end 
-  const refreshDataGrid = () => {
-    (gridRef as RefObject<DataGridRef>).current?.instance().refresh();
-  }
+
   //onContentReady
-  const onContentReady = (e: ContentReadyEvent) => {
-    // Ví dụ: focus vào hàng đầu tiên khi grid sẵn sàng
-    const grid = e.component as any;
-    if (!grid.__focusedInitialized) {
-      grid.__focusedInitialized = true;
-      grid.option("focusedRowKey", grid.getVisibleRows()?.[0]?.key);
-    }
+  // const onContentReady = (e: ContentReadyEvent) => {
+  //   const grid = e.component as any;
+  //   if (!grid.__focusedInitialized && grid.getVisibleRows()?.length) {
+  //     grid.__focusedInitialized = true;
+
+  //     const firstKey = grid.getVisibleRows()[0]?.key;
+  //     if (firstKey !== grid.option("focusedRowKey")) {
+  //       grid.option("focusedRowKey", firstKey);
+  //       console.log(grid);
+  //     }
+  //   }
 
 
-  }
+  // }
   // 
   return (
-    <div className='m-[10px] '>
+    <div className='flex flex-col h-[85vh]'>
       <div className='Title_content text-lg'>
         {props.Title}
       </div>
-      <div className='dataGrid'>
+      <div className='flex-1 overflow-y-auto'>
         <DataGrid
           dataSource={props.dataSource}
           keyExpr={props.keyExpr}
@@ -354,22 +352,28 @@ const Grid_custom = forwardRef<DataGridRef, ChildProps>((props: ChildProps, grid
           showColumnLines={true}
           showRowLines={true}
           rowAlternationEnabled={false}
-          width={'100%'}
-          height={'100%'}
+          width='100%'
+          height='100%'
           ref={gridRef}
           onExporting={onExporting}
           onToolbarPreparing={onToolbarPreparing}
           onSelectionChanged={selectedChanged}
           allowColumnResizing={true}
           remoteOperations={true}
-          onContentReady={onContentReady}
-          syncLookupFilterValues={false} 
+          onInitialized={(e:any) => {
+            const firstKey = e.component.getVisibleRows()?.[0]?.key;
+            if (firstKey) setFocusedRowKey(firstKey);
+          }}
+          syncLookupFilterValues={false}
+          wordWrapEnabled={true}
+          twoWayBindingEnabled={true}
+          // scrolling= { {showScrollbar: 'always',preloadEnabled: true} }
         >
           {/* columns */}
           <Addcolumn items={props.cols} />
           {/* end */}
 
-          <Paging defaultPageSize={20} />
+          <Paging enabled={true} pageSize={20} />
           <Pager visible={true} showPageSizeSelector={true} allowedPageSizes={allowedPageSizes} />
           <Selection mode="multiple" selectAllMode={"allPages"} showCheckBoxesMode={"onClick"} />
           <SearchPanel visible={true} placeholder="Tra cứu" width={280} />
@@ -380,6 +384,7 @@ const Grid_custom = forwardRef<DataGridRef, ChildProps>((props: ChildProps, grid
             </Form>
           </Editing>
           <Export enabled={true} formats={exportFormats} allowExportSelectedData={true} />
+          {/* <Scrolling mode="virtual" showScrollbar='always' useNative={false} /> or "virtual" | "infinite" */}
           <LoadPanel enabled={true} />
         </DataGrid>
       </div>

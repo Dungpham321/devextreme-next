@@ -3,7 +3,7 @@ import './globals.css';
 
 import { SidebarProvider } from '@/context/SidebarContext';
 import { ThemeProvider } from '@/context/ThemeContext';
-
+import '@fortawesome/fontawesome-free/css/all.min.css';
 import 'devextreme/dist/css/dx.light.css';
 // import 'devextreme/dist/css/dx.dark.css';
 

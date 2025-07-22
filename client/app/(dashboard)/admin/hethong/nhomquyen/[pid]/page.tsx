@@ -6,7 +6,8 @@ import { DataSource, DataSourceP } from "@/utils/GlobalService";
 import SelectBox from 'devextreme-react/select-box';
 import { Button, ButtonRef } from 'devextreme-react/button';
 import themes from 'devextreme/ui/themes';
-import { GetData } from '@/utils/GlobalService';
+import { GetData, PostData } from '@/utils/GlobalService';
+import { useToast } from '@/components/devextreme/Toast_custom';
 
 interface DataSourceType {
     data: any;
@@ -18,20 +19,21 @@ const PhanQuyenPage = () => {
     const btnRef = useRef<ButtonRef>(null);
     const autoSelect = useRef(false);
     const [RID, setRID] = useState(params.pid);
+    const {triggerToast} = useToast();
     const dataListQuyen = DataSourceP("HT_NHOMQUYEN_QUYEN/ListQUYEN", ["MA"], ["MA", "TEN", "CHUC_NANG"], ["SAP_XEP"], {
         ca: true
     }) as DataSourceType
     const dataListNhomQuyen = DataSourceP("HT_NHOMQUYEN/List", ["_id"], ["_id", "TEN"], ["TEN"], {
         ca: true
     }) as DataSourceType
-    const loadData = () => {
+    const loadData = (selected:any) => {
         if (typeof treeViewRef === 'undefined') return;
         setTimeout(() => {
             treeViewRef.current?.instance().option('visible', true)
         }, 500);
         if (typeof treeViewRef !== 'undefined') treeViewRef.current?.instance().unselectAll();
         btnRef.current?.instance().option('disabled', true);
-        GetData('HT_NHOMQUYEN_QUYEN/List', { RID: RID }).then((reponse: any) => {
+        GetData('HT_NHOMQUYEN_QUYEN/List', { RID: selected }).then((reponse: any) => {
             const items = reponse.Data;
             const nodes: any = treeViewRef.current?.instance().getNodes();
             autoSelect.current = true;
@@ -51,10 +53,14 @@ const PhanQuyenPage = () => {
 
         });
     }
-    useEffect(() => {
-        loadData()
-    }, [RID]);
-
+    const LuuQuyen = (e:any) => {
+        treeViewRef.current?.instance().option('searchValue', '');
+        const reqData = treeViewRef.current?.instance().getSelectedNodeKeys();
+        PostData("HT_NHOMQUYEN_QUYEN/Create",{ RID: RID, items: reqData}).then((response) => {
+            triggerToast("Lưu thành công!", 'success');
+        });
+        e.component.option('disabled', true);
+    } 
     return (
         <div>
             <div className="w-auto">
@@ -78,10 +84,10 @@ const PhanQuyenPage = () => {
                             setRID(selected);
                             if (typeof RID !== 'undefined') {
                                 setTimeout(() => {
-                                    loadData();
+                                    loadData(selected);
                                 }, 200);
                             } else {
-                                loadData();
+                                loadData(selected);
                             }
                         }}
                     />
@@ -90,9 +96,8 @@ const PhanQuyenPage = () => {
                         text="Lưu lại"
                         type='success'
                         ref={btnRef}
-                        //disabled= {true}
                         onClick={(e)=>{
-
+                            LuuQuyen(e);
                         }}
                         
                     />

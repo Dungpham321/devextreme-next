@@ -1,11 +1,6 @@
 const baseController = require("../baseController");
 const { NhomChucNang, NhomQuyen, DsDoiTuong, DsChucNang } = require('../../Library/Enum');
-module.exports = class HT_NHOMQUYEN_QUYENController extends baseController {
-    constructor() {
-        const nhomQuyen = NhomQuyen.nhomquyen;
-        const nhomChucNang = NhomChucNang.QuanTriHeThong;
-        super(nhomQuyen, nhomChucNang); // Truyền biến sang BaseController
-    }
+module.exports = class HT_NGUOIDUNG_SDController extends baseController {
 
     get = async (req, res) => {
         const op = req.params.op;
