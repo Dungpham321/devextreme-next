@@ -4,7 +4,7 @@ import Popup from 'devextreme-react/popup';
 import { Button } from 'devextreme-react/button';
 import DataGrid, { Column, DataGridRef, type DataGridTypes } from 'devextreme-react/data-grid';
 import Grid_custom from "@/components/devextreme/Grid_custom";
-import { hideGridHeader } from '../funtion/FuntionGrid';
+import { hideGridHeader, noneCheck } from '../funtion/FuntionGrid';
 interface PopupNDProps {
     visible: boolean;
     title?: string;
@@ -53,6 +53,7 @@ const PopupND: React.FC<PopupNDProps> = ({
     useEffect(() => {
         setTimeout(() => {
             hideGridHeader(gridRef);
+            noneCheck(gridRef);
         }, 200);
         
     }, [visible]);
