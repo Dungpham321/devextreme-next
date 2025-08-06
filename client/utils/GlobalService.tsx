@@ -3,6 +3,8 @@ import CustomStore from 'devextreme/data/custom_store';
 import axiosAuth from '@/utils/Axios';
 import { GetCookie } from '@/components/auth/cookies';
 import { useToast } from '@/components/devextreme/Toast_custom';
+import { CustomStoreOptions } from "devextreme/data/custom_store";
+
 const URL_API = process.env.NEXT_PUBLIC_URL_API;
 
 interface LoadOptions {
@@ -147,15 +149,15 @@ export function DataSource(u: any, k: any, f: any, s: any, exOps = {}) {//url, k
                 key_url = encodeURIComponent(key_url);
             }
             op.bu(key, values);
-            let result:any = await PutData(u + op.uu + "/" + key_url, values);
-           if (result.status == 204) triggerToast("Cập nhật thành công","success",5000);
+            let result: any = await PutData(u + op.uu + "/" + key_url, values);
+            if (result.status == 204) triggerToast("Cập nhật thành công", "success", 5000);
             return result;
         },
         async insert(values) {
             op.bi(values);
             let result: any = await PostData(u + op.ui, values);
             if (result.status == 204) {
-                triggerToast("Thêm mới thành công","success",5000);
+                triggerToast("Thêm mới thành công", "success", 5000);
                 op.ai(result);
                 return result;
             }
@@ -195,7 +197,7 @@ export function DataSourceP(u: any, k: any, f: any, s: any, exOps = {}) {//url, 
 };
 //check response
 export const checkResponseStatus = (response: ApiResponse): boolean => {
-   
+
     let result = true;
     const currentUser = typeof window !== 'undefined' && GetCookie();
     if (response.status === -1) {

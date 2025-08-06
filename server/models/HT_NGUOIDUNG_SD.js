@@ -4,6 +4,7 @@ const HT_NGUOIDUNG_SDSchema = new mongoose.Schema({
     DOITUONG_ID: {type: mongoose.Schema.Types.ObjectId},
     DOITUONG_LOAI: { type: String },
     CHUCNANG: {type: String},
+    ND_ID: {type: String},
     DATA: {type: String},
     ngaytao: { type: Date, default: Date.now }
 });

@@ -1,13 +1,38 @@
 const baseController = require("../baseController");
 const { NhomChucNang, NhomQuyen, DsDoiTuong, DsChucNang } = require('../../Library/Enum');
+const ShortUniqueId = require('short-unique-id');
+
 module.exports = class HT_NGUOIDUNG_SDController extends baseController {
 
     get = async (req, res) => {
         const op = req.params.op;
         if (op == "List") {
-            const RID = req.query.RID;
-            const data = await this.db.HT_DOITUONG_QUYENCollection.GetByDOITUONG_ID(RID, DsDoiTuong.DM_DANHMUC, DsChucNang.NhomQuyen);
-            return this.ObjectResult(res, data);
+            const controller = new baseController(null, null, req);
+            const userId = controller.NGUOIDUNG_ID;
+            const DOITUONG_ID = req.query.DOITUONG_ID;
+            const CHUCNANG = req.query.CHUCNANG;
+            const DOITUONG_LOAI = req.query.CHUCNANG;
+            var lstNGUOIDUNG_SDInfo = [];
+            var lstHT_NGUOIDUNG_SD = [];
+            if (DOITUONG_ID == "") {
+                lstHT_NGUOIDUNG_SD = await this.db.HT_NGUOIDUNG_SDCollection.GetByDOITUONG_ID_ND(DOITUONG_ID, DOITUONG_LOAI, CHUCNANG, userId);
+            } else {
+                lstHT_NGUOIDUNG_SD = await this.db.HT_NGUOIDUNG_SDCollection.GetByDOITUONG_ID(DOITUONG_ID, DOITUONG_LOAI, CHUCNANG);
+            }
+            const lstNguoiDung = await this.db.UserCollection.GetAllUser();
+            lstNguoiDung.forEach(item => {
+                const uid = new ShortUniqueId({ length: 10 });
+                const ac = null;
+                if(lstHT_NGUOIDUNG_SD.length > 0) ac = lstHT_NGUOIDUNG_SD.find(c => c.NGUOIDUNG_ID === item._id);
+                lstNGUOIDUNG_SDInfo.push({
+                    _id: ac == null ? uid.rnd() : ac._id,
+                    NGUOIDUNG_ID: item._id,
+                    DOITUONG_ID: DOITUONG_ID,
+                    TEN_DANG_NHAP: item.ten_dang_nhap,
+                    CHON: ac != null,
+                });
+            });
+            return this.ObjectResult(res, lstNGUOIDUNG_SDInfo);
         } else if (op == "ListQUYEN") {
             const data = await baseController.getSystemPermissionTree();
             const resutl = { items: data };
@@ -41,12 +66,12 @@ module.exports = class HT_NGUOIDUNG_SDController extends baseController {
             const lstQuyenInsert = lstInsert.map(s => s.QUYEN);
             // Danh sách quyền cần xóa khỏi DB
             lstDOITUONG.forEach(item => {
-                if (!lstQuyenInsert.includes(item.QUYEN) &&!QUYEN_IDs.includes(item.QUYEN)) {
+                if (!lstQuyenInsert.includes(item.QUYEN) && !QUYEN_IDs.includes(item.QUYEN)) {
                     lstDelete.push(item);
                 }
             });
-            if(lstInsert.length > 0) await this.db.HT_DOITUONG_QUYENCollection.InsertBulk(lstInsert);
-            if(lstDelete.length > 0) await this.db.HT_DOITUONG_QUYENCollection.DeleteBulk(lstDelete);
+            if (lstInsert.length > 0) await this.db.HT_DOITUONG_QUYENCollection.InsertBulk(lstInsert);
+            if (lstDelete.length > 0) await this.db.HT_DOITUONG_QUYENCollection.DeleteBulk(lstDelete);
         } else if (op == "Delete") {
             // const raw = req.body; // hoặc từ query, formData
             // const parsed = typeof raw === 'string' ? JSON.parse(raw.replace(/'/g, '"')) : raw;

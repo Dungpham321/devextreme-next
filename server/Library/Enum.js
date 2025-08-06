@@ -17,7 +17,7 @@ class DsDoiTuong{
     static DM_DANHMUC = "DM_DANHMUC";
 }
 class DsChucNang{
-    static NhomQuyen = 'Nhóm quyền'
+    static NhomQuyen = 'HT_NHOMQUYEN'
 }
 module.exports = {
     RequestState,

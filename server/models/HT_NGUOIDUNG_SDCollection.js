@@ -30,6 +30,15 @@ module.exports = class HT_NGUOIDUNG_SDCollection extends Collection {
         });
         return result
     }
+    async GetByDOITUONG_ID_ND(DOITUONG_ID, DOITUONG_LOAI, CHUCNANG, ND_ID) {
+        const result = await HT_NGUOIDUNG_SD.find({
+            DOITUONG_ID: DOITUONG_ID,
+            DOITUONG_LOAI: DOITUONG_LOAI,
+            CHUCNANG: CHUCNANG,
+            ND_ID: ND_ID
+        });
+        return result
+    }
     async InsertBulk(items) {
         await HT_NGUOIDUNG_SD.insertMany(items);
     }

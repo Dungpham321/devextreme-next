@@ -8,6 +8,7 @@ function loadRouters(app, routePath = "/api", routerDir = path.join(__dirname)) 
         const router = require(fullPath);
         if(routeName.toLowerCase() === "loadrouters") return;
         const mountPath = routeName.toLowerCase() === "dangnhap"? `${routePath}/login`: `${routePath}/${routeName}`;
+        console.log(mountPath);
         app.use(mountPath, router);
     });
 }

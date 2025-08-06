@@ -11,10 +11,11 @@ const fs = require('fs');
 const path = require('path');
 
 module.exports = class baseController {
-    constructor(nhomQuyen, nhomChucNang) {
+    constructor(nhomQuyen, nhomChucNang, req) {
         this.db = new DBContext();
         this.nhomQuyen = nhomQuyen;
         this.nhomChucNang = nhomChucNang;
+        this.req = req;
 
     }
     ObjectResult = function (res, data, Code = RequestState.Success, Message = 'Success', statusCode = 200) {
@@ -35,8 +36,8 @@ module.exports = class baseController {
         };
         return res.status(statusCode).json(response);
     };
-    NoContentResult = function(res, Message="no content result", statusCode = 204){
-        return res.status(statusCode).json({'Message': Message});
+    NoContentResult = function (res, Message = "no content result", statusCode = 204) {
+        return res.status(statusCode).json({ 'Message': Message });
     }
     CreateToken = function (data = {}) {
         const maxAge = 3 * 60 * 60;
@@ -128,6 +129,10 @@ module.exports = class baseController {
         const searchValue = req.query.searchValue;
         const jFields = JSON.parse(req.query.fields);
         const rawFilter = req.query.filter ? JSON.parse(req.query.filter) : [];
+        let selectFields = "";
+        if (Array.isArray(jFields) && jFields.length > 0) {
+            selectFields = jFields.join(" ");
+        }
         const query = {};
         if (rawFilter.length) {
             query = this.buildMongoQueryFromFilter(rawFilter, model.schema);
@@ -141,14 +146,14 @@ module.exports = class baseController {
                     const field = firstSort.selector;
                     const order = firstSort.desc ? -1 : 1;
                     sort = { [field]: order };
-                    items = await model.find(query).sort(sort).skip(skip).limit(take);
+                    items = await model.find(query).select(selectFields).sort(sort).skip(skip).limit(take);
                 }
             } catch (err) {
                 console.warn('Lỗi parse sort:', err.message);
             }
         } else {
             const sortDesc = { 'ngaytao': -1 };
-            items = await model.find(query).sort(sortDesc).skip(skip).limit(take);
+            items = await model.find(query).select(selectFields).sort(sortDesc).skip(skip).limit(take);
         }
         const totalCount = await model.countDocuments(query);
         return { items, totalCount };
@@ -229,22 +234,22 @@ module.exports = class baseController {
             const chucnangKey = cleanKey(chucnang);
             // 📌 Mục CHỨC_NĂNG
             // data.push(new Quyen(chucnangKey, '', '', 0));
-            const dataChucNang = {MA: chucnangKey, TEN: chucnang, NHOM_QUYEN:"", CHUC_NANG: "", SAP_XEP: 0};
+            const dataChucNang = { MA: chucnangKey, TEN: chucnang, NHOM_QUYEN: "", CHUC_NANG: "", SAP_XEP: 0 };
             data.push(Quyen.fromObject(dataChucNang, ""));
             const listNhomQuyen = [...new Set(listPerm.filter(p => p.CHUC_NANG === chucnang).map(p => p.NHOM_QUYEN))].sort();
             for (const nhomQuyen of listNhomQuyen) {
                 const nhomQuyenKey = cleanKey(nhomQuyen);
-                const NoiChuoi = nhomQuyenKey+chucnangKey;
-                 const dataNhomQuyen = {MA: NoiChuoi, TEN: nhomQuyen, NHOM_QUYEN:"", CHUC_NANG: chucnangKey, SAP_XEP: 0};
-                  data.push(Quyen.fromObject(dataNhomQuyen, ""));
+                const NoiChuoi = nhomQuyenKey + chucnangKey;
+                const dataNhomQuyen = { MA: NoiChuoi, TEN: nhomQuyen, NHOM_QUYEN: "", CHUC_NANG: chucnangKey, SAP_XEP: 0 };
+                data.push(Quyen.fromObject(dataNhomQuyen, ""));
                 // 📌 Mục NHÓM_QUYỀN
                 // data.push(new Quyen(nhomQuyenKey, '', chucnangKey, 0));
                 const listQuyen = listPerm.filter(p => p.CHUC_NANG === chucnang && p.NHOM_QUYEN === nhomQuyen).sort((a, b) => a.SAP_XEP - b.SAP_XEP);
                 for (const quyen of listQuyen) {
                     if (inQuyen && !inQuyen.includes(quyen.MA)) continue;
                     // 📌 Mục QUYỀN CỤ THỂ cleanKey(nhomQuyen+chucnangKey)
-                    const NoiChuoi = cleanKey(nhomQuyen+chucnangKey);
-                     //data.push(new Quyen(nhomQuyenKey, '', chucnangKey, 0));
+                    const NoiChuoi = cleanKey(nhomQuyen + chucnangKey);
+                    //data.push(new Quyen(nhomQuyenKey, '', chucnangKey, 0));
                     data.push(Quyen.fromObject(quyen, NoiChuoi));
                 }
             }
@@ -273,4 +278,16 @@ module.exports = class baseController {
 
         return controllerPaths;
     }
+    get NGUOIDUNG_ID() {
+        try {
+            const authHeader = this.req.headers.authorization;
+            const token = authHeader?.split(' ')[1];
+            if (!token) return 0;
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            return decoded._id || 0;
+        } catch (err) {
+            return 0;
+        }
+    }
+
 }

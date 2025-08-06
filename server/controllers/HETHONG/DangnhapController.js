@@ -14,6 +14,7 @@ module.exports = class DangNhapController extends baseController{
                 const match = await bcrypt.compare(data.mat_khau, objHT_NGUOIDUNG.mat_khau);
                 if(match){
                     const datatoken = {
+                        _id: objHT_NGUOIDUNG._id,
                         ten_dang_nhap: objHT_NGUOIDUNG.ten_dang_nhap,
                         email: objHT_NGUOIDUNG.email,
                     };

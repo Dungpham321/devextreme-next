@@ -158,12 +158,9 @@ const Grid_custom = forwardRef<DataGridRef, ChildProps>((props: ChildProps, grid
   const allowedPageSizes = [10, 100, 200];
   const notesEditorOptions = { height: 100 };
   const [toolbars, settoolbars] = useState(props.toolbars || []);
-
-  // const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
   const selectedRowIndex = useRef(-1);
   const [selectedRowData, setSelectedRowData] = useState([]);
   const [focusedRowKey, setFocusedRowKey] = useState<number | null>(null);
-
   //accessButton
   const [visibleNew, setvisibleNew] = useState(props.n);
   const [visibleEdit, setvisibleEdit] = useState(props.e);
@@ -177,7 +174,7 @@ const Grid_custom = forwardRef<DataGridRef, ChildProps>((props: ChildProps, grid
       const index = e.component.getRowIndexByKey(e.selectedRowKeys[0]);
       selectedRowIndex.current = index;
       refreshToolbar()
-    }else{
+    } else {
       selectedRowIndex.current = -1;
       refreshToolbar();
     }
@@ -460,7 +457,16 @@ const Grid_custom = forwardRef<DataGridRef, ChildProps>((props: ChildProps, grid
     });
   }
   //end 
-
+  const RowUpdating = (e: any) => {
+    e.cancel = new Promise((resolve, reject) => {
+      resolve(false);
+    });
+  };
+  const onRowInserting = (e: any) => {
+    e.cancel = new Promise((resolve, reject) => {
+      resolve(false);
+    });
+  }
   //onContentReady
   // const onContentReady = (e: ContentReadyEvent) => {
   //   const grid = e.component as any;
@@ -501,11 +507,20 @@ const Grid_custom = forwardRef<DataGridRef, ChildProps>((props: ChildProps, grid
           onSelectionChanged={selectedChanged}
           allowColumnResizing={true}
           remoteOperations={true}
-          focusedRowEnabled={true}
+          focusedRowEnabled={false}
           syncLookupFilterValues={false}
           wordWrapEnabled={true}
           twoWayBindingEnabled={true}
           repaintChangesOnly={true}
+          onRowUpdating={RowUpdating}
+          onRowInserting={onRowInserting}
+          onRowUpdated={(e) => {
+            e.component.refresh(); // Làm mới lại Grid sau khi cập nhật
+          }}
+          onRowInserted={(e) => {
+            e.component.refresh(); // Làm mới lại Grid sau khi thêm mới
+          }}
+
         // scrolling= { {showScrollbar: 'always',preloadEnabled: true} }
         >
           {/* columns */}

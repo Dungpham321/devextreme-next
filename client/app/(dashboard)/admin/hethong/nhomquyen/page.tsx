@@ -5,15 +5,24 @@ import { DataSource, DataSourceP } from "@/utils/GlobalService";
 import DataGrid, { Column, DataGridRef, type DataGridTypes } from 'devextreme-react/data-grid';
 import { useRouter, useParams } from 'next/navigation';
 import PopupND from '@/components/devextreme/popup/Popup_ND';
+import $ from "jquery";
 
 interface DataSourceType {
     data: any;
     items: [];
 }
+interface par {
+    nguoidung_id: string,
+    doituong_id: string,
+    doituong_loai: string,
+    chucnang: string
+}
 export default function NhomQuyen() {
+
     const router = useRouter();
     const gridRef = useRef<DataGridRef | null>(null);
     const [showPopup, setShowPopup] = useState(false);
+    const [popupData, setPopupData] = useState<par | null>(null);
     const ChildProps = {
         keyExpr: "_id",
         n: true,
@@ -66,16 +75,26 @@ export default function NhomQuyen() {
                         icon: "fa-solid fa-user",
                         name: "config",
                         onClick(e: DataGridTypes.ColumnButtonClickEvent) {
-                            // if (e.row) router.push("/admin/hethong/nhomquyen/" + e.row.data._id);
+                            if (e.row)
+                                setPopupData({
+                                    nguoidung_id: '',
+                                    doituong_id: e.row.data._id,
+                                    doituong_loai: '',
+                                    chucnang: 'HT_NHOMQUYEN'
+                                });
+                            // router.push("/admin/hethong/nhomquyen/" + e.row.data._id);
                             setShowPopup(true);
                         }
                     }
                 ]
             }
-
         },
     ]
-
+    const onClose = () => {
+        setPopupData(null);
+        setShowPopup(false);
+        gridRef.current?.instance()?.refresh();
+    }
     return (
         <div className="">
             <Grid_custom
@@ -93,7 +112,11 @@ export default function NhomQuyen() {
                 url='HT_NHOMQUYEN'
             />
             <div className='popup'>
-                <PopupND visible={showPopup} onClose={() => setShowPopup(false)} showFooter={true} onConfirm={() => console.log('Đã xác nhận')} height={500} width={800}></PopupND>
+                {showPopup && (
+                    <PopupND visible={showPopup} onClose={() => onClose()} showFooter={true} onConfirm={() => console.log('Đã xác nhận')} height={500} width={800}
+                        parm={popupData}>
+                    </PopupND>
+                )}
             </div>
         </div>
     );

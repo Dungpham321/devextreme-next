@@ -1,6 +1,7 @@
 import { RefObject } from 'react';
 import { DataGrid } from 'devextreme-react/data-grid';
 import type { DataGridRef } from 'devextreme-react/data-grid';
+import applyChangesToData from "devextreme/data/apply_changes";
 
 export const hideGridHeader = (gridRef: RefObject<DataGridRef | null>) => {
   const instance = gridRef?.current?.instance();
@@ -16,3 +17,11 @@ export const hideGridHeader = (gridRef: RefObject<DataGridRef | null>) => {
   });
   instance.repaint();
 };
+export function getGridDataChanges(gridRef: React.RefObject<any>) {
+  const grid = gridRef.current?.instance();
+  const allData = grid?.getDataSource()?.items() || [];
+  const changes = grid?.option("editing.changes") || [];
+  const merged = applyChangesToData(allData, changes, { keyExpr: "_id" });
+  return merged;
+}
+

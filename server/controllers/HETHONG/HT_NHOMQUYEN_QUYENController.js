@@ -17,6 +17,9 @@ module.exports = class HT_NHOMQUYEN_QUYENController extends baseController {
             const data = await baseController.getSystemPermissionTree();
             const resutl = { items: data };
             return this.ObjectResult(res, resutl);
+        } else if(op == "ListNguoiDung"){
+            const data = await this.db.UserCollection.GetAllUser();
+            return this.ObjectResult(res, data);
         }
         return this.badrequest(res, "Lỗi kết nối");
     }
