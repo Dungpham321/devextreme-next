@@ -11,12 +11,10 @@ const fs = require('fs');
 const path = require('path');
 
 module.exports = class baseController {
-    constructor(nhomQuyen, nhomChucNang, req) {
+    constructor(nhomQuyen, nhomChucNang) {
         this.db = new DBContext();
         this.nhomQuyen = nhomQuyen;
         this.nhomChucNang = nhomChucNang;
-        this.req = req;
-
     }
     ObjectResult = function (res, data, Code = RequestState.Success, Message = 'Success', statusCode = 200) {
         const response = {
@@ -278,9 +276,20 @@ module.exports = class baseController {
 
         return controllerPaths;
     }
-    get NGUOIDUNG_ID() {
-        try {
-            const authHeader = this.req.headers.authorization;
+    // get NGUOIDUNG_ID() {
+    //     try {
+    //         const authHeader = this.req.headers.authorization;
+    //         const token = authHeader?.split(' ')[1];
+    //         if (!token) return 0;
+    //         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    //         return decoded._id || 0;
+    //     } catch (err) {
+    //         return 0;
+    //     }
+    // }
+    GetNGUOIDUNG_ID(req){
+         try {
+            const authHeader = req.headers.authorization;
             const token = authHeader?.split(' ')[1];
             if (!token) return 0;
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -289,5 +298,4 @@ module.exports = class baseController {
             return 0;
         }
     }
-
 }

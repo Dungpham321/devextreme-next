@@ -6,7 +6,7 @@ import DataGrid, { Column, DataGridRef, type DataGridTypes } from 'devextreme-re
 import Grid_custom from "@/components/devextreme/Grid_custom";
 import { hideGridHeader } from '../funtion/FuntionGrid';
 import { getGridDataChanges } from '../funtion/FuntionGrid';
-import { DataSource, GetData } from '@/utils/GlobalService';
+import { DataSource, GetData, PostData } from '@/utils/GlobalService';
 interface PopupNDProps {
     visible: boolean;
     title?: string;
@@ -55,11 +55,11 @@ const PopupND: React.FC<PopupNDProps> = ({
 }) => {
     const [dataSourced, setdataSourced] = useState([]);
     const gridRef = useRef<DataGridRef | null>(null);
-   // const dataSource = DataSource("user", ['_id'], ["ten_dang_nhap", "ho_ten"], ["ngaytao"]) as DataSourceType;
+    // const dataSource = DataSource("user", ['_id'], ["ten_dang_nhap", "ho_ten"], ["ngaytao"]) as DataSourceType;
     //const dataMemo = useMemo(() => { return dataSource.data }, [visible]);
     const GetDataSource = () => {
-        GetData("HT_NGUOIDUNG_SD/List",{
-            NGUOIDUNG_ID: parm?.nguoidung_id, 
+        GetData("HT_NGUOIDUNG_SD/List", {
+            NGUOIDUNG_ID: parm?.nguoidung_id,
             DOITUONG_ID: parm?.doituong_id,
             CHUCNANG: parm?.chucnang,
             DOITUONG_LOAI: parm?.doituong_loai
@@ -68,21 +68,29 @@ const PopupND: React.FC<PopupNDProps> = ({
         });
     }
     const col = [
-        { df: "_id", c: "Mã", w: 150, ae: false, v:false},
+        { df: "ID", c: "Mã", w: 150, ae: false, v: false },
         { df: "TEN_DANG_NHAP", c: "Tên đăng nhập", ae: false },
-        { df: "CHON", c: "Chọn", dt: 'boolean',w: 80, ae: true }
+        { df: "CHON", c: "Chọn", dt: 'boolean', w: 80, ae: true }
     ]
     useEffect(() => {
-       GetDataSource();
+        GetDataSource();
         setTimeout(() => {
             hideGridHeader(gridRef);
             gridRef.current?.instance().option('editing.allowUpdating', true);
         }, 200);
     }, [visible]);
-    
+
     var onConfirmD = () => {
-        const megger = getGridDataChanges(gridRef);
-        ///console.log("All", megger);
+        const merge = getGridDataChanges(gridRef);
+        PostData("HT_NGUOIDUNG_SD/Create", {
+            NGUOIDUNG_ID: parm?.nguoidung_id,
+            DOITUONG_ID: parm?.doituong_id,
+            CHUCNANG: parm?.chucnang,
+            DOITUONG_LOAI: parm?.doituong_loai,
+            dataMain: merge
+        }).then((response:any)=>{
+            console.log(response);
+        });
     }
     return (
         <Popup

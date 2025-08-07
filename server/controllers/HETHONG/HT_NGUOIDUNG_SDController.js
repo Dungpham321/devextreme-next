@@ -7,8 +7,7 @@ module.exports = class HT_NGUOIDUNG_SDController extends baseController {
     get = async (req, res) => {
         const op = req.params.op;
         if (op == "List") {
-            const controller = new baseController(null, null, req);
-            const userId = controller.NGUOIDUNG_ID;
+            const userId = this.GetNGUOIDUNG_ID();
             const DOITUONG_ID = req.query.DOITUONG_ID;
             const CHUCNANG = req.query.CHUCNANG;
             const DOITUONG_LOAI = req.query.CHUCNANG;
@@ -23,9 +22,10 @@ module.exports = class HT_NGUOIDUNG_SDController extends baseController {
             lstNguoiDung.forEach(item => {
                 const uid = new ShortUniqueId({ length: 10 });
                 const ac = null;
-                if(lstHT_NGUOIDUNG_SD.length > 0) ac = lstHT_NGUOIDUNG_SD.find(c => c.NGUOIDUNG_ID === item._id);
+                if (lstHT_NGUOIDUNG_SD.length > 0) ac = lstHT_NGUOIDUNG_SD.find(c => c.NGUOIDUNG_ID === item._id);
                 lstNGUOIDUNG_SDInfo.push({
-                    _id: ac == null ? uid.rnd() : ac._id,
+                    _id: uid.rnd(),
+                    ID: ac == null ? 0 : ac._id,
                     NGUOIDUNG_ID: item._id,
                     DOITUONG_ID: DOITUONG_ID,
                     TEN_DANG_NHAP: item.ten_dang_nhap,
@@ -44,46 +44,45 @@ module.exports = class HT_NGUOIDUNG_SDController extends baseController {
         const op = req.params.op;
         if (op == "Create") {
             const data = Object(req.body);
-            const RID = data.RID;
-            const QUYEN_IDs = data.items;
-            const lstDOITUONG = await this.db.HT_DOITUONG_QUYENCollection.GetByDOITUONG_ID(RID, DsDoiTuong.DM_DANHMUC, DsChucNang.NhomQuyen);
-            const lstQuyen = await baseController.getSystemPermission().map(q => q.MA);
+            const NGUOIDUNG_ID = data.NGUOIDUNG_ID;
+            const DOITUONG_ID = data.DOITUONG_ID;
+            const CHUCNANG = data.CHUCNANG;
+            const DOITUONG_LOAI = data.DOITUONG_LOAI;
+            const dataMain = data.dataMain; //array
+            const userId = this.GetNGUOIDUNG_ID(req);
             const lstInsert = [];
+            const lstUpdate = [];
             const lstDelete = [];
-            for (const e of QUYEN_IDs) {
-                if (!lstQuyen.includes(e)) continue;
-                const exists = lstDOITUONG.some(item => item.QUYEN === e);
-                if (!exists) {
-                    lstInsert.push({
-                        DOITUONG_ID: RID,
-                        DOITUONG_LOAI: DsDoiTuong.DM_DANHMUC,
-                        CHUCNANG: DsChucNang.NhomQuyen.toString(),
-                        QUYEN: e
-                    });
-                }
-            }
-            // Danh sách quyền cần giữ lại
-            const lstQuyenInsert = lstInsert.map(s => s.QUYEN);
-            // Danh sách quyền cần xóa khỏi DB
-            lstDOITUONG.forEach(item => {
-                if (!lstQuyenInsert.includes(item.QUYEN) && !QUYEN_IDs.includes(item.QUYEN)) {
-                    lstDelete.push(item);
+            const lstHT_NGUOIDUNG_SD = await this.db.HT_NGUOIDUNG_SDCollection.GetByDOITUONG_ID(DOITUONG_ID, DOITUONG_LOAI, CHUCNANG);
+            dataMain.forEach((item) => {
+                if (item.ID == 0) {
+                    if (item.CHON) {
+                        lstInsert.push({
+                            NGUOIDUNG_ID: item.NGUOIDUNG_ID,
+                            DOITUONG_ID: DOITUONG_ID,
+                            CHUCNANG: CHUCNANG,
+                            DOITUONG_LOAI: DOITUONG_LOAI,
+                            ND_ID: userId
+                        });
+                    }
+                } else {
+                    const objHT_NGUOIDUNG_SD = lstHT_NGUOIDUNG_SD.find(x => x._id === item.ID) || null;
+                    if (objHT_NGUOIDUNG_SD == null) return;
+                    if (!item.CHON) {
+                        lstDelete.push(...objHT_NGUOIDUNG_SD);
+                    }
                 }
             });
-            if (lstInsert.length > 0) await this.db.HT_DOITUONG_QUYENCollection.InsertBulk(lstInsert);
-            if (lstDelete.length > 0) await this.db.HT_DOITUONG_QUYENCollection.DeleteBulk(lstDelete);
+            const ids =  dataMain.map(s => s.ID);
+            const itemsToDelete = lstHT_NGUOIDUNG_SD.filter(c => !ids.includes(c._id));
+            lstDelete.push(...itemsToDelete);
+            if(lstInsert.length > 0) await this.db.HT_NGUOIDUNG_SDCollection.InsertBulk(lstInsert);
+            if(lstDelete.length > 0) await this.db.HT_NGUOIDUNG_SDCollection.DeleteBulk(lstDelete);
+
         } else if (op == "Delete") {
-            // const raw = req.body; // hoặc từ query, formData
-            // const parsed = typeof raw === 'string' ? JSON.parse(raw.replace(/'/g, '"')) : raw;
-            // const ids = JSON.parse(parsed.items); // nếu items là chuỗi JSON  
-            // for (const id of ids) {
-            //     await this.db.HT_NHOMQUYENCollection.Delete(id);
-            // }
-            // return this.ObjectResult(res, null);
+
         }
         return this.NoContentResult(res);
-        ư
-
     }
     put = async (req, res) => {
         // const id = req.params.id;
