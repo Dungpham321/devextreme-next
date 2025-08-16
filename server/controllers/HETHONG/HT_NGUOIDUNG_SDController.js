@@ -1,6 +1,7 @@
 const baseController = require("../baseController");
 const { NhomChucNang, NhomQuyen, DsDoiTuong, DsChucNang } = require('../../Library/Enum');
 const ShortUniqueId = require('short-unique-id');
+const HT_NGUOIDUNG_SD = require("../../models/HT_NGUOIDUNG_SD");
 
 module.exports = class HT_NGUOIDUNG_SDController extends baseController {
 
@@ -10,19 +11,20 @@ module.exports = class HT_NGUOIDUNG_SDController extends baseController {
             const userId = this.GetNGUOIDUNG_ID();
             const DOITUONG_ID = req.query.DOITUONG_ID;
             const CHUCNANG = req.query.CHUCNANG;
-            const DOITUONG_LOAI = req.query.CHUCNANG;
+            const DOITUONG_LOAI = req.query.DOITUONG_LOAI;
             var lstNGUOIDUNG_SDInfo = [];
             var lstHT_NGUOIDUNG_SD = [];
             if (DOITUONG_ID == "") {
                 lstHT_NGUOIDUNG_SD = await this.db.HT_NGUOIDUNG_SDCollection.GetByDOITUONG_ID_ND(DOITUONG_ID, DOITUONG_LOAI, CHUCNANG, userId);
             } else {
                 lstHT_NGUOIDUNG_SD = await this.db.HT_NGUOIDUNG_SDCollection.GetByDOITUONG_ID(DOITUONG_ID, DOITUONG_LOAI, CHUCNANG);
+
             }
             const lstNguoiDung = await this.db.UserCollection.GetAllUser();
             lstNguoiDung.forEach(item => {
                 const uid = new ShortUniqueId({ length: 10 });
-                const ac = null;
-                if (lstHT_NGUOIDUNG_SD.length > 0) ac = lstHT_NGUOIDUNG_SD.find(c => c.NGUOIDUNG_ID === item._id);
+                let ac = null;
+                if (lstHT_NGUOIDUNG_SD.length > 0) ac = lstHT_NGUOIDUNG_SD.find(c => c.NGUOIDUNG_ID.toString() === item._id.toString());
                 lstNGUOIDUNG_SDInfo.push({
                     _id: uid.rnd(),
                     ID: ac == null ? 0 : ac._id,
@@ -51,9 +53,9 @@ module.exports = class HT_NGUOIDUNG_SDController extends baseController {
             const dataMain = data.dataMain; //array
             const userId = this.GetNGUOIDUNG_ID(req);
             const lstInsert = [];
-            const lstUpdate = [];
             const lstDelete = [];
             const lstHT_NGUOIDUNG_SD = await this.db.HT_NGUOIDUNG_SDCollection.GetByDOITUONG_ID(DOITUONG_ID, DOITUONG_LOAI, CHUCNANG);
+
             dataMain.forEach((item) => {
                 if (item.ID == 0) {
                     if (item.CHON) {
@@ -66,18 +68,27 @@ module.exports = class HT_NGUOIDUNG_SDController extends baseController {
                         });
                     }
                 } else {
-                    const objHT_NGUOIDUNG_SD = lstHT_NGUOIDUNG_SD.find(x => x._id === item.ID) || null;
+                    const objHT_NGUOIDUNG_SD = lstHT_NGUOIDUNG_SD.find(x => x._id.toString() === item.ID.toString()) || null;
                     if (objHT_NGUOIDUNG_SD == null) return;
+
                     if (!item.CHON) {
-                        lstDelete.push(...objHT_NGUOIDUNG_SD);
+                        lstDelete.push(objHT_NGUOIDUNG_SD);
+                    } else {
+                        lstInsert.push({
+                            NGUOIDUNG_ID: objHT_NGUOIDUNG_SD.NGUOIDUNG_ID,
+                            DOITUONG_ID: objHT_NGUOIDUNG_SD.DOITUONG_ID,
+                            CHUCNANG: objHT_NGUOIDUNG_SD.CHUCNANG,
+                            DOITUONG_LOAI: objHT_NGUOIDUNG_SD.DOITUONG_LOAI,
+                            ND_ID: userId
+                        });
                     }
                 }
             });
-            const ids =  dataMain.map(s => s.ID);
+            const ids = dataMain.map(s => s.ID);
             const itemsToDelete = lstHT_NGUOIDUNG_SD.filter(c => !ids.includes(c._id));
             lstDelete.push(...itemsToDelete);
-            if(lstInsert.length > 0) await this.db.HT_NGUOIDUNG_SDCollection.InsertBulk(lstInsert);
-            if(lstDelete.length > 0) await this.db.HT_NGUOIDUNG_SDCollection.DeleteBulk(lstDelete);
+            if (lstInsert.length > 0) await this.db.HT_NGUOIDUNG_SDCollection.InsertBulk(lstInsert);
+            if (lstDelete.length > 0) await this.db.HT_NGUOIDUNG_SDCollection.DeleteBulk(lstDelete);
             return this.ObjectResult(res, null);
         } else if (op == "Delete") {
 

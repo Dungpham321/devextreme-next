@@ -1,4 +1,5 @@
 const HT_DOITUONG_QUYEN = require("./HT_DOITUONG_QUYEN");
+const HT_NGUOIDUNG_SD = require("./HT_NGUOIDUNG_SD");
 const Collection = require("./Collection");
 module.exports = class HT_DOITUONG_QUYENCollection extends Collection {
     GetAll() {
@@ -27,6 +28,14 @@ module.exports = class HT_DOITUONG_QUYENCollection extends Collection {
             DOITUONG_ID: DOITUONG_ID,
             DOITUONG_LOAI: DOITUONG_LOAI,
             CHUCNANG: CHUCNANG
+        });
+        return result
+    }
+    async GetByDsDOITUONG_ID(DOITUONG_IDs){
+        const result = await HT_DOITUONG_QUYEN.find({
+            DOITUONG_ID: { $in: DOITUONG_IDs },
+            DOITUONG_LOAI: "DM_DANHMUC",
+            CHUCNANG: "HT_NHOMQUYEN"
         });
         return result
     }

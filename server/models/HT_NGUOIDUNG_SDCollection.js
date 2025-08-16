@@ -22,6 +22,14 @@ module.exports = class HT_NGUOIDUNG_SDCollection extends Collection {
     async Delete(id) {
         await HT_NGUOIDUNG_SD.findByIdAndDelete(id);
     }
+    async GetByNGUOIDUNG_ID(NGUOIDUNG_ID, DOITUONG_LOAI, CHUCNANG) {
+        const result = await HT_NGUOIDUNG_SD.find({
+            NGUOIDUNG_ID: NGUOIDUNG_ID,
+            DOITUONG_LOAI: DOITUONG_LOAI,
+            CHUCNANG: CHUCNANG
+        });
+        return result
+    }
     async GetByDOITUONG_ID(DOITUONG_ID, DOITUONG_LOAI, CHUCNANG) {
         const result = await HT_NGUOIDUNG_SD.find({
             DOITUONG_ID: DOITUONG_ID,
@@ -47,4 +55,15 @@ module.exports = class HT_NGUOIDUNG_SDCollection extends Collection {
             _id: { $in: items.map(item => item._id) }
         });
     }
+    async UpdateBulk(items) {
+        const bulkOps = items.map(item => ({
+            updateOne: {
+                filter: { _id: item._id },
+                update: { $set: item }
+            }
+        }));
+
+        await HT_NGUOIDUNG_SD.bulkWrite(bulkOps);
+    }
+
 }
