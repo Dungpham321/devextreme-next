@@ -23,7 +23,6 @@ app.use((req, res, next) => {
 app.use("/api",DangNhap_router);
 loadRouters(app);
 app.use(verifyJWT);
-
 const start = async () => {
     try {
         await connectDB(process.env.MONGGODB_URL);

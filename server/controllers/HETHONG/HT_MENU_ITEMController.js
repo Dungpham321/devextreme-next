@@ -38,6 +38,7 @@ module.exports = class HT_MENU_ITEMController extends baseController {
             const fields = this.Mapfields(model, data);
             fields.ngaytao = new Date();
             const objMenuItem = await this.db.HT_MENU_ITEMCollection.Create(fields);
+            return this.ObjectResult(res,null);
         } else if (op == "Delete") {
             const raw = req.body; // hoặc từ query, formData
             const parsed = typeof raw === 'string' ? JSON.parse(raw.replace(/'/g, '"')) : raw;

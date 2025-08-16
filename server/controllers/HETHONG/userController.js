@@ -3,22 +3,20 @@ const baseController = require("../baseController");
 const bcrypt = require('bcrypt');
 const { NhomChucNang, NhomQuyen } = require('../../Library/Enum');
 module.exports = class userController extends baseController {
-     constructor() {
-            const nhomQuyen = NhomQuyen.nguoidung;
-            const nhomChucNang = NhomChucNang.QuanTriHeThong;
-            super(nhomQuyen, nhomChucNang); // Truyền biến sang BaseController
-        }
-        static permission() {
-            const ctrl = new userController();
-            return ctrl.quyenCoBan(); // hoặc ctrl.quyenCoBan('Xem', 'Sua') nếu muốn cụ thể
-        }
+    constructor() {
+        const nhomQuyen = NhomQuyen.nguoidung;
+        const nhomChucNang = NhomChucNang.QuanTriHeThong;
+        super(nhomQuyen, nhomChucNang); // Truyền biến sang BaseController
+    }
+    static permission() {
+        const ctrl = new userController();
+        return ctrl.quyenCoBan(); // hoặc ctrl.quyenCoBan('Xem', 'Sua') nếu muốn cụ thể
+    }
     get = async (req, res) => {
         const op = req.params.op;
         if (op == "List") {
             const data = await this.ListAll(user, req);
-            // this.db.UserCollection.GetAllUser();
             return this.ObjectResult(res, data);
-
         } else if (op == "tendangnhap") {
 
             const { ten_dang_nhap } = req.query;
@@ -37,6 +35,7 @@ module.exports = class userController extends baseController {
             fields.mat_khau = await bcrypt.hash(fields.mat_khau, 10);
             fields.ngay_tao = new Date();
             const id = await this.db.UserCollection.Create(fields);
+            return this.ObjectResult(res, null);
         } else if (op == "Delete") {
             const raw = req.body; // hoặc từ query, formData
             const parsed = typeof raw === 'string' ? JSON.parse(raw.replace(/'/g, '"')) : raw;
@@ -44,6 +43,7 @@ module.exports = class userController extends baseController {
             for (const id of ids) {
                 await this.db.UserCollection.Delete(id);
             }
+            return this.ObjectResult(res, null);
         }
         return this.NoContentResult(res);
     }

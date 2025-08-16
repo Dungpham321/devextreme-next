@@ -78,7 +78,7 @@ module.exports = class HT_NGUOIDUNG_SDController extends baseController {
             lstDelete.push(...itemsToDelete);
             if(lstInsert.length > 0) await this.db.HT_NGUOIDUNG_SDCollection.InsertBulk(lstInsert);
             if(lstDelete.length > 0) await this.db.HT_NGUOIDUNG_SDCollection.DeleteBulk(lstDelete);
-
+            return this.ObjectResult(res, null);
         } else if (op == "Delete") {
 
         }

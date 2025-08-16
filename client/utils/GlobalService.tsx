@@ -43,7 +43,6 @@ interface ResultData {
     items: any;
     totalCount: number;
 }
-
 export async function GetData(url: string, data: object | null) {
     let resData;
     let status = 0;
@@ -62,7 +61,6 @@ export async function PostData(url: string, data: object | null) {
     });
     return resData;
 }
-
 export async function PutData(url: string, data: object | null) {
     let resData;
     await axiosAuth.put(URL_API + url, data).then(function (response) {
@@ -70,7 +68,6 @@ export async function PutData(url: string, data: object | null) {
     });
     return resData;
 }
-
 export async function DeleteData(url: string, data: object | null) {
     let resData;
     await axiosAuth.delete(URL_API + url, { data: data }).then(function (response) {

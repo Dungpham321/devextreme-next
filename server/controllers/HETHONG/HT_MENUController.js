@@ -29,6 +29,7 @@ module.exports = class HT_MENUController extends baseController {
             const fields = this.Mapfields(model, data);
             fields.ngaytao = new Date();
             const objMenu = await this.db.HT_MENUCollection.Create(fields);
+             return this.ObjectResult(res, null);
         } else if (op == "Delete") {
             const raw = req.body; // hoặc từ query, formData
             const parsed = typeof raw === 'string' ? JSON.parse(raw.replace(/'/g, '"')) : raw;
@@ -38,7 +39,7 @@ module.exports = class HT_MENUController extends baseController {
             }
             return this.ObjectResult(res, null);
         }
-        return res.status(204).json({ 'Message': "no content result" });
+        return this.NoContentResult(res);
     }
     put = async (req, res) => {
         const id = req.params.id;

@@ -35,7 +35,7 @@ module.exports = class baseController {
         return res.status(statusCode).json(response);
     };
     NoContentResult = function (res, Message = "no content result", statusCode = 204) {
-        return res.status(statusCode).json({ 'Message': Message });
+        return res.status(statusCode).send();
     }
     CreateToken = function (data = {}) {
         const maxAge = 3 * 60 * 60;
@@ -131,7 +131,7 @@ module.exports = class baseController {
         if (Array.isArray(jFields) && jFields.length > 0) {
             selectFields = jFields.join(" ");
         }
-        const query = {};
+        var query = {};
         if (rawFilter.length) {
             query = this.buildMongoQueryFromFilter(rawFilter, model.schema);
         }

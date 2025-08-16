@@ -29,6 +29,7 @@ module.exports = class HT_NHOMQUYENController extends baseController {
             const fields = this.Mapfields(model, data);
             fields.ngaytao = new Date();
             const objNhomQuyen = await this.db.HT_NHOMQUYENCollection.Create(fields);
+            return this.ObjectResult(res, null);
         } else if (op == "Delete") {
             const raw = req.body; // hoặc từ query, formData
             const parsed = typeof raw === 'string' ? JSON.parse(raw.replace(/'/g, '"')) : raw;

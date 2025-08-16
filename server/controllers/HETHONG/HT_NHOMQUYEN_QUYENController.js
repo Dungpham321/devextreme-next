@@ -55,6 +55,7 @@ module.exports = class HT_NHOMQUYEN_QUYENController extends baseController {
             });
             if(lstInsert.length > 0) await this.db.HT_DOITUONG_QUYENCollection.InsertBulk(lstInsert);
             if(lstDelete.length > 0) await this.db.HT_DOITUONG_QUYENCollection.DeleteBulk(lstDelete);
+            return this.ObjectResult(res, null);
         } else if (op == "Delete") {
             // const raw = req.body; // hoặc từ query, formData
             // const parsed = typeof raw === 'string' ? JSON.parse(raw.replace(/'/g, '"')) : raw;
@@ -65,7 +66,6 @@ module.exports = class HT_NHOMQUYEN_QUYENController extends baseController {
             // return this.ObjectResult(res, null);
         }
         return this.NoContentResult(res);
-        ư
 
     }
     put = async (req, res) => {
