@@ -277,9 +277,9 @@ module.exports = class baseController {
 
         return controllerPaths;
     }
-    GetNGUOIDUNG_ID() {
+    GetNGUOIDUNG_ID(req) {
         try {
-            const authHeader = this.req.headers.authorization;
+            const authHeader = req.headers.authorization;
             const token = authHeader?.split(' ')[1];
             if (!token) return 0;
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -288,16 +288,34 @@ module.exports = class baseController {
             return 0;
         }
     }
-    static GetPermission() {
-        const curentUser = this.getCurrentUser();
-        const nhomquyen = this.db.HT_NGUOIDUNG_SDCollection.GetByNGUOIDUNG_ID(curentUser._id, "", "HT_NHOMQUYEN").map(s => s.DOITUONG_ID);
-        var _lstHT_DOITUONG_QUYEN = this.db.HT_DOITUONG_QUYENCollection.GetByDsDOITUONG_ID(nhomquyen).ToList();
+    async GetPermission(req) {
+        const curentUser = await this.getCurrentUser(req);
+        const nhomquyenRaw = await this.db.HT_NGUOIDUNG_SDCollection.GetByNGUOIDUNG_ID(curentUser._id, "", "HT_NHOMQUYEN"); //.map(s => s.DOITUONG_ID)
+        const nhomquyen = nhomquyenRaw.map(s => s.DOITUONG_ID);
+        var _lstHT_DOITUONG_QUYEN = await this.db.HT_DOITUONG_QUYENCollection.GetByDsDOITUONG_ID(nhomquyen);
         return _lstHT_DOITUONG_QUYEN;
     }
-
-    getCurrentUser() {
-        var currentUser = this.db.UserCollection.GetById(GetNGUOIDUNG_ID());
+    async getCurrentUser(req) {
+        const userId = this.GetNGUOIDUNG_ID(req);
+        var currentUser = await this.db.UserCollection.GetById(userId);
         return currentUser;
+    }
+    async isAdmin(req) {
+        var currentUser = await this.getCurrentUser(req);
+        return currentUser.ten_dang_nhap.toLowerCase() === 'admin';
+    }
+    async userAccess(name, req) {
+        const isAdmin = await this.isAdmin(req);
+        if (isAdmin) return true;
+        const userPermission =await this.GetPermission(req);
+        if (userPermission && userPermission.some((c) => c.QUYEN.toLowerCase() === name.toLowerCase())) {
+            return true;
+        }
+        return false;
+    }
+    async CurentMenu(req){
+        const result = await this.db.HT_MENU_ITEMCollection.GetbyUrl(process.env.MENU_ADMIN, req.query.url);
+        return result? result.NAME : "";
     }
 
 }

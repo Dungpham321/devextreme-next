@@ -12,6 +12,7 @@ class NhomQuyen{
     static menuitem = "Liên kết menu";
     static nguoidung = "Người dùng";
     static nhomquyen = "Nhóm quyền";
+    static cauhinh = "Cấu hình hệ thống";
 }
 class DsDoiTuong{
     static DM_DANHMUC = "DM_DANHMUC";

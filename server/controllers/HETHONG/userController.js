@@ -2,6 +2,7 @@ const user = require("../../models/user");
 const baseController = require("../baseController");
 const bcrypt = require('bcrypt');
 const { NhomChucNang, NhomQuyen } = require('../../Library/Enum');
+const { QuyenEnum } = require('../../Library/QuyenEnum');
 module.exports = class userController extends baseController {
     constructor() {
         const nhomQuyen = NhomQuyen.nguoidung;
@@ -14,7 +15,16 @@ module.exports = class userController extends baseController {
     }
     get = async (req, res) => {
         const op = req.params.op;
-        if (op == "List") {
+        if (op == "Access") {
+            return this.ObjectResult(res, {
+                View: await this.userAccess("xemnguoidungquantrihethong", req),
+                New: await this.userAccess("themnguoidungquantrihethong", req),
+                Edit: await this.userAccess("suanguoidungquantrihethong", req),
+                Delete: await this.userAccess("xoanguoidungquantrihethong", req),
+                Title: await this.CurentMenu(req)
+            })
+        }
+        else if (op == "List") {
             const data = await this.ListAll(user, req);
             return this.ObjectResult(res, data);
         } else if (op == "tendangnhap") {
